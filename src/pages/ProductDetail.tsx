@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Heart, Share2 } from 'lucide-react';
 import { products } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,14 +12,15 @@ const ProductDetail = () => {
   
   const product = products.find(p => p.id === id);
   const [selectedSize, setSelectedSize] = useState('');
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Mock additional images
   const productImages = product ? [
     product.image,
     product.image.replace('w=400', 'w=500'),
-    product.image.replace('h=600', 'h=700')
+    product.image.replace('h=600', 'h=700'),
+    product.image.replace('fit=crop', 'fit=cover'),
+    product.image.replace('400', '450')
   ] : [];
 
   if (!product) {
@@ -44,14 +45,6 @@ const ProductDetail = () => {
       title: "Added to cart!",
       description: `${product.name} (Size: ${selectedSize}) added to your cart`,
     });
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
   };
 
   return (
@@ -79,44 +72,32 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Image Carousel */}
+      {/* Scrollable Image Gallery */}
       <div className="relative">
-        <div className="aspect-square overflow-hidden">
-          <img
-            src={productImages[currentImageIndex]}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+        <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+          {productImages.map((image, index) => (
+            <div
+              key={index}
+              className="aspect-square min-w-full snap-center overflow-hidden"
+            >
+              <img
+                src={image}
+                alt={`${product.name} ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
         </div>
         
-        {productImages.length > 1 && (
-          <>
-            <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
-            >
-              <ChevronRight size={20} />
-            </button>
-            
-            {/* Image indicators */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-              {productImages.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${
-                    index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Image indicators */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+          {productImages.map((_, index) => (
+            <div
+              key={index}
+              className="w-2 h-2 rounded-full bg-white/70"
+            />
+          ))}
+        </div>
       </div>
 
       {/* Product Info */}
@@ -155,7 +136,7 @@ const ProductDetail = () => {
                 onClick={() => setSelectedSize(size)}
                 className={`px-4 py-2 border rounded-lg transition-colors ${
                   selectedSize === size
-                    ? 'border-orange-500 bg-orange-50 text-orange-500'
+                    ? 'border-green-500 bg-green-50 text-green-500'
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
@@ -168,7 +149,7 @@ const ProductDetail = () => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+          className="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
         >
           Add to Cart
         </button>

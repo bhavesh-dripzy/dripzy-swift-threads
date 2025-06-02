@@ -16,7 +16,7 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }: CategorySelect
           onClick={() => onCategoryChange(category.id)}
         >
           <div className="relative">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 hover:border-orange-300 transition-colors">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-300 transition-colors">
               <img
                 src={category.image}
                 alt={category.name}
@@ -25,12 +25,12 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }: CategorySelect
             </div>
           </div>
           <span className={`text-sm font-medium transition-colors ${
-            selectedCategory === category.id ? 'text-orange-500' : 'text-gray-700'
+            selectedCategory === category.id ? 'text-green-500' : 'text-gray-700'
           }`}>
             {category.name}
           </span>
           {selectedCategory === category.id && (
-            <div className="w-8 h-0.5 bg-orange-500 rounded-full"></div>
+            <div className="w-8 h-0.5 bg-green-500 rounded-full"></div>
           )}
         </div>
       ))}

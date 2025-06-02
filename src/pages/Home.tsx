@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import CategorySelector from '@/components/common/CategorySelector';
-import BannerCarousel from '@/components/common/BannerCarousel';
-import QuickPicks from '@/components/product/QuickPicks';
+import AutoBannerCarousel from '@/components/common/AutoBannerCarousel';
+import QuickPicksGrid from '@/components/product/QuickPicksGrid';
 import ProductSection from '@/components/product/ProductSection';
 import { products } from '@/data/mockData';
 
@@ -13,7 +13,6 @@ const Home = () => {
   const trendingProducts = products.filter(p => p.discount);
   const newArrivals = products.slice(2, 6);
   const under999 = products.filter(p => p.price < 1000);
-  const quickPickProducts = products.slice(0, 4);
 
   return (
     <div className="pt-16 pb-20 min-h-screen bg-gray-50">
@@ -24,7 +23,7 @@ const Home = () => {
           <input
             type="text"
             placeholder="I am looking for..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -37,11 +36,11 @@ const Home = () => {
         />
       </div>
 
-      {/* Banner */}
-      <BannerCarousel selectedCategory={selectedCategory} />
+      {/* Auto Banner */}
+      <AutoBannerCarousel selectedCategory={selectedCategory} />
 
-      {/* Quick Picks */}
-      <QuickPicks products={quickPickProducts} />
+      {/* Quick Picks Grid */}
+      <QuickPicksGrid selectedCategory={selectedCategory} />
 
       {/* Product Sections */}
       <ProductSection

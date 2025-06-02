@@ -28,12 +28,12 @@ const Categories = () => {
                 />
               </div>
               <span className={`text-sm font-medium ${
-                selectedCategory === category.id ? 'text-orange-500' : 'text-gray-700'
+                selectedCategory === category.id ? 'text-green-500' : 'text-gray-700'
               }`}>
                 {category.name}
               </span>
               {selectedCategory === category.id && (
-                <div className="w-6 h-0.5 bg-orange-500 rounded-full"></div>
+                <div className="w-6 h-0.5 bg-green-500 rounded-full"></div>
               )}
             </div>
           ))}

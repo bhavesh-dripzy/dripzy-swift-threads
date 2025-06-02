@@ -15,7 +15,7 @@ const ProductSection = ({ title, products, viewAllLink }: ProductSectionProps) =
       <div className="flex items-center justify-between px-4 mb-4">
         <h2 className="text-lg font-bold text-gray-900">{title}</h2>
         {viewAllLink && (
-          <button className="flex items-center gap-1 text-orange-500 text-sm font-medium hover:text-orange-600 transition-colors">
+          <button className="flex items-center gap-1 text-green-500 text-sm font-medium hover:text-green-600 transition-colors">
             View All
             <ArrowRight size={14} />
           </button>
