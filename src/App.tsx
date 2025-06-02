@@ -8,6 +8,7 @@ import Header from "./components/layout/Header";
 import BottomNav from "./components/layout/BottomNav";
 import Home from "./pages/Home";
 import Categories from "./pages/Categories";
+import Brands from "./pages/Brands";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";

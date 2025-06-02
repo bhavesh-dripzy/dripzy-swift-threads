@@ -4,6 +4,8 @@ import { Search } from 'lucide-react';
 import CategorySelector from '@/components/common/CategorySelector';
 import AutoBannerCarousel from '@/components/common/AutoBannerCarousel';
 import QuickPicksGrid from '@/components/product/QuickPicksGrid';
+import EthnicCollectionSection from '@/components/product/EthnicCollectionSection';
+import BannerProductSection from '@/components/product/BannerProductSection';
 import ProductSection from '@/components/product/ProductSection';
 import { products } from '@/data/mockData';
 
@@ -13,6 +15,7 @@ const Home = () => {
   const trendingProducts = products.filter(p => p.discount);
   const newArrivals = products.slice(2, 6);
   const under999 = products.filter(p => p.price < 1000);
+  const topsProducts = products.slice(0, 8);
 
   return (
     <div className="pt-16 pb-20 min-h-screen bg-gray-50">
@@ -42,23 +45,30 @@ const Home = () => {
       {/* Quick Picks Grid */}
       <QuickPicksGrid selectedCategory={selectedCategory} />
 
-      {/* Product Sections */}
+      {/* Ethnic Collection Section (Image 1 Style) - Show only for women category */}
+      {selectedCategory === 'women' && <EthnicCollectionSection />}
+
+      {/* New Arrivals with Banner (Image 2 Style) */}
+      <BannerProductSection
+        title="Tops"
+        subtitle="Everyday Slay, Every Way."
+        products={topsProducts}
+        bannerImage="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=500&h=300&fit=crop"
+      />
+
+      {/* Under ₹999 with Banner */}
+      <BannerProductSection
+        title="Under ₹999"
+        subtitle="Budget-Friendly Fashion Finds"
+        products={under999}
+        bannerImage="https://images.unsplash.com/photo-1445205170230-053b83016050?w=500&h=300&fit=crop"
+      />
+
+      {/* Regular Product Sections */}
       <ProductSection
         title="Trending Now"
         products={trendingProducts}
         viewAllLink="/trending"
-      />
-
-      <ProductSection
-        title="New Arrivals"
-        products={newArrivals}
-        viewAllLink="/new-arrivals"
-      />
-
-      <ProductSection
-        title="Under ₹999"
-        products={under999}
-        viewAllLink="/under-999"
       />
 
       {/* Brands Section */}
