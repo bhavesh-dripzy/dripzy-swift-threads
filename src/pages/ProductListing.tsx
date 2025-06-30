@@ -435,13 +435,19 @@ const ProductListPage = () => {
       initialTags.push(tag);
     }
     
-    // Clear existing filters first, then set new ones
-    clearFilters();
-    if (initialTags.length > 0) {
+    // Only update if different to avoid redundant state updates
+    if (
+      initialTags.length !== filterState.selectedTags.length ||
+      initialTags.some(t => !filterState.selectedTags.includes(t)) ||
+      filterState.selectedTags.some(t => !initialTags.includes(t))
+    ) {
       console.log('ProductListPage - Setting initial tags from URL:', initialTags);
-      setFilters(initialTags);
+      clearFilters();
+      if (initialTags.length > 0) {
+        setFilters(initialTags);
+      }
     }
-  }, [searchQuery, tag, setFilters, clearFilters]);
+  }, [searchQuery, tag, setFilters, clearFilters, filterState.selectedTags]);
 
   // Scroll to top when component mounts
   useEffect(() => {

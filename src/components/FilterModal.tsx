@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -131,7 +132,10 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent 
+        key={filterState.selectedTags.join(',')}
+        className="max-w-md max-h-[80vh] overflow-y-auto"
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
