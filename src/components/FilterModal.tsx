@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -106,24 +105,20 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
-          const isChecked = isTagSelected(tag);
+          const isChecked = Boolean(isTagSelected(tag));
           return (
             <div key={tag} className="flex items-center space-x-3">
               <Checkbox
                 id={`checkbox-${tag}`}
                 checked={isChecked}
                 onCheckedChange={() => {
-                  console.log(`Checkbox ${tag} toggled, was:`, isChecked);
+                  console.log(`Checkbox ${tag} toggled, current state:`, isChecked);
                   handleTagToggle(tag);
                 }}
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-                onClick={() => {
-                  console.log(`Label clicked for ${tag}`);
-                  handleTagToggle(tag);
-                }}
               >
                 {display}
               </Label>
