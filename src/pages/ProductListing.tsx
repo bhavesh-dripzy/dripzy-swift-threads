@@ -406,7 +406,7 @@ const fetchProductsByTag = async ({
 
 const ProductListPage = () => {
   const [searchParams] = useSearchParams();
-  const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = useFilter();
+  const { filterState, setFilters, getQueryString, getSortKey } = useFilter();
   const collection = searchParams.get('collection');
   const searchQuery = searchParams.get('search');
   const tag = searchParams.get('tag');
@@ -416,7 +416,7 @@ const ProductListPage = () => {
   console.log('ProductListPage - Tag parameter:', tag);
   console.log('ProductListPage - Filter state:', filterState);
 
-  // Initialize filters based on URL parameters - FIXED SYNC ISSUE
+  // Initialize filters based on URL parameters
   useEffect(() => {
     const initialTags: string[] = [];
     
@@ -435,19 +435,10 @@ const ProductListPage = () => {
       initialTags.push(tag);
     }
     
-    // Only update if different to avoid redundant state updates
-    if (
-      initialTags.length !== filterState.selectedTags.length ||
-      initialTags.some(t => !filterState.selectedTags.includes(t)) ||
-      filterState.selectedTags.some(t => !initialTags.includes(t))
-    ) {
-      console.log('ProductListPage - Setting initial tags from URL:', initialTags);
-      clearFilters();
-      if (initialTags.length > 0) {
-        setFilters(initialTags);
-      }
+    if (initialTags.length > 0) {
+      setFilters(initialTags);
     }
-  }, [searchQuery, tag, setFilters, clearFilters, filterState.selectedTags]);
+  }, [searchQuery, tag, setFilters]);
 
   // Scroll to top when component mounts
   useEffect(() => {
