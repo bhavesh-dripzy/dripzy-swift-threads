@@ -77,44 +77,35 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - Local tags:', localTags);
 
-  // Sync local state ONLY when modal opens
+  // Sync local state when modal opens or filter state changes
   useEffect(() => {
     if (isOpen) {
-      console.log('FilterModal - Modal opened, syncing local tags with:', filterState.selectedTags);
-      setLocalTags([...filterState.selectedTags]);
+      setLocalTags(filterState.selectedTags);
     }
-  }, [isOpen, filterState.selectedTags]); // Keep filterState.selectedTags to sync properly
+  }, [isOpen, filterState.selectedTags]);
 
   const toggleTag = (tag: string) => {
     console.log('FilterModal - Toggling tag:', tag);
-    setLocalTags(prev => {
-      const newTags = prev.includes(tag)
+    setLocalTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
-        : [...prev, tag];
-      console.log('FilterModal - New local tags:', newTags);
-      return newTags;
-    });
+        : [...prev, tag]
+    );
   };
 
   const handleApply = () => {
     console.log('FilterModal - Applying filters:', localTags);
-    setFilters(localTags); // Update global context
-    
-    // Small delay to ensure state is updated before closing
-    setTimeout(() => {
-      onApply(); // Trigger refetch
-      onClose(); // Close modal
-    }, 100);
+    setFilters(localTags); // update context
+    onApply();
+    onClose();
   };
 
   const handleClearAll = () => {
-    console.log('FilterModal - Clearing all filters');
     setLocalTags([]);
     clearFilters();
   };
 
   const handleRemoveTag = (tag: string) => {
-    console.log('FilterModal - Removing tag:', tag);
     setLocalTags(prev => prev.filter(t => t !== tag));
   };
 
@@ -124,18 +115,14 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
           const isChecked = localTags.includes(tag);
-          console.log(`FilterModal - Checkbox ${tag}: ${isChecked}`);
           return (
             <div key={tag} className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onChange={(e) => {
-                  console.log(`FilterModal - Checkbox changed for ${tag}:`, e.target.checked);
-                  toggleTag(tag);
-                }}
-                className="accent-orange-500 w-4 h-4"
+                onChange={() => toggleTag(tag)}
+                className="accent-green-500 w-4 h-4"
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
@@ -153,7 +140,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
@@ -161,14 +148,14 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
-              className="text-orange-500 hover:text-orange-600"
+              className="text-green-500 hover:text-green-600"
             >
               Clear All
             </Button>
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto space-y-4">
+        <div className="space-y-4">
           {/* Selected Filters Summary */}
           {localTags.length > 0 && (
             <div className="pb-4 border-b">
@@ -187,11 +174,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     <Badge
                       key={tag}
                       variant="default"
-                      className="bg-orange-500 text-white hover:bg-orange-600"
+                      className="bg-green-500 text-white"
                     >
                       {displayName}
                       <X 
-                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-orange-600 rounded-full" 
+                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
                         onClick={() => handleRemoveTag(tag)}
                       />
                     </Badge>
@@ -207,8 +194,8 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           {renderFilterSection("Style", FILTER_OPTIONS.style)}
         </div>
 
-        {/* Fixed Apply Button at Bottom */}
-        <div className="flex gap-3 pt-4 border-t mt-4">
+        {/* Apply Button */}
+        <div className="flex gap-3 pt-4 border-t">
           <Button
             variant="outline"
             onClick={onClose}
@@ -218,7 +205,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           </Button>
           <Button
             onClick={handleApply}
-            className="flex-1 bg-orange-500 hover:bg-orange-600"
+            className="flex-1 bg-green-500 hover:bg-green-600"
           >
             Apply Filters
           </Button>
