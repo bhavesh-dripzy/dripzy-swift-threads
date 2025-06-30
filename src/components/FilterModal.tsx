@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -74,6 +75,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   const { filterState, addFilter, removeFilter, clearFilters } = useFilter();
 
   console.log('FilterModal - Current filter state:', filterState);
+  console.log('FilterModal - isOpen:', isOpen);
 
   const handleApply = () => {
     onApply();
@@ -96,16 +98,22 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
           const isChecked = Boolean(isTagSelected(tag));
+          console.log(`FilterModal - Rendering ${tag}, isChecked:`, isChecked);
+          
           return (
             <div key={tag} className="flex items-center space-x-3">
               <Checkbox
                 id={`checkbox-${tag}`}
                 checked={isChecked}
                 onCheckedChange={(checked) => {
-                  console.log(`Checkbox ${tag} changed to:`, checked);
+                  console.log(`FilterModal - Checkbox ${tag} onCheckedChange called with:`, checked);
+                  console.log(`FilterModal - Before change, selectedTags:`, filterState.selectedTags);
+                  
                   if (checked) {
+                    console.log(`FilterModal - Adding filter: ${tag}`);
                     addFilter(tag);
                   } else {
+                    console.log(`FilterModal - Removing filter: ${tag}`);
                     removeFilter(tag);
                   }
                 }}
