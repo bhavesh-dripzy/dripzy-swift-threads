@@ -406,7 +406,7 @@ const fetchProductsByTag = async ({
 
 const ProductListPage = () => {
   const [searchParams] = useSearchParams();
-  const { filterState, setFilters, getQueryString, getSortKey } = useFilter();
+const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = useFilter();
   const collection = searchParams.get('collection');
   const searchQuery = searchParams.get('search');
   const tag = searchParams.get('tag');
@@ -417,28 +417,30 @@ const ProductListPage = () => {
   console.log('ProductListPage - Filter state:', filterState);
 
   // Initialize filters based on URL parameters
-  useEffect(() => {
-    const initialTags: string[] = [];
-    
-    if (searchQuery) {
-      // Parse search query for tags
-      const tagMatches = searchQuery.match(/tag:([^"]+?)(?:\s|$)/g);
-      if (tagMatches) {
-        tagMatches.forEach(match => {
-          const tag = match.replace('tag:', '').trim();
-          if (tag && !initialTags.includes(tag)) {
-            initialTags.push(tag);
-          }
-        });
-      }
-    } else if (tag) {
-      initialTags.push(tag);
+ useEffect(() => {
+  const initialTags: string[] = [];
+
+  if (searchQuery) {
+    const tagMatches = searchQuery.match(/tag:([^"]+?)(?:\s|$)/g);
+    if (tagMatches) {
+      tagMatches.forEach(match => {
+        const tag = match.replace('tag:', '').trim();
+        if (tag && !initialTags.includes(tag)) {
+          initialTags.push(tag);
+        }
+      });
     }
-    
-    if (initialTags.length > 0) {
-      setFilters(initialTags);
-    }
-  }, [searchQuery, tag, setFilters]);
+  } else if (tag) {
+    initialTags.push(tag);
+  }
+
+  if (initialTags.length > 0) {
+    setFilters(initialTags);
+  } else {
+    clearFilters(); // ✅ Clear if nothing passed in query
+  }
+}, [searchQuery, tag, setFilters, clearFilters]);
+
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -489,25 +491,26 @@ const ProductListPage = () => {
   };
 
   const getQueryKey = () => {
-    const filterQuery = getQueryString();
-    const sortKey = getSortKey();
-    const reverse = filterState.sortBy === 'price-high';
-    
-    let finalQuery = filterQuery;
-    if (searchQuery && !filterQuery) {
-      finalQuery = searchQuery;
-    } else if (searchQuery && filterQuery) {
-      finalQuery = `${searchQuery} AND ${filterQuery}`;
-    }
-    
-    if (finalQuery || tag) {
-      return ['shopifySearchResults', finalQuery || `tag:${tag}`, sortKey, reverse];
-    } else if (collection) {
-      return ['shopifyCollectionProducts', collection, sortKey, reverse, finalQuery];
-    } else {
-      return ['shopifyProducts', sortKey, reverse, finalQuery];
-    }
-  };
+  const filterQuery = getQueryString();
+  const sortKey = getSortKey();
+  const reverse = filterState.sortBy === 'price-high';
+  
+  let finalQuery = filterQuery;
+  if (searchQuery && !filterQuery) {
+    finalQuery = searchQuery;
+  } else if (searchQuery && filterQuery) {
+    finalQuery = `${searchQuery} AND ${filterQuery}`;
+  }
+
+  if (finalQuery || tag) {
+    return ['shopifySearchResults', finalQuery || `tag:${tag}`, sortKey, reverse, filterState.selectedTags.join(',')];
+  } else if (collection) {
+    return ['shopifyCollectionProducts', collection, sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
+  } else {
+    return ['shopifyProducts', sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
+  }
+};
+
 
   const {
     data,
