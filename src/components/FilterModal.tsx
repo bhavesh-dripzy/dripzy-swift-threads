@@ -3,7 +3,6 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { useFilter } from '../contexts/FilterContext';
@@ -76,7 +75,6 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - isOpen:', isOpen);
-  console.log('FilterModal - Dialog should be open:', isOpen);
 
   const handleApply = () => {
     onApply();
@@ -103,12 +101,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           
           return (
             <div key={tag} className="flex items-center space-x-3">
-              <Checkbox
+              <input
+                type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onCheckedChange={(checked) => {
-                  console.log(`FilterModal - Dialog is open when checkbox clicked:`, isOpen);
-                  console.log(`FilterModal - Checkbox ${tag} onCheckedChange called with:`, checked);
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  console.log(`Checkbox ${tag} toggled via native input:`, checked);
                   console.log(`FilterModal - Before change, selectedTags:`, filterState.selectedTags);
                   
                   if (checked) {
@@ -124,6 +123,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     console.log(`FilterModal - After change, selectedTags:`, filterState.selectedTags);
                   }, 100);
                 }}
+                className="accent-green-500 w-4 h-4 cursor-pointer"
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
