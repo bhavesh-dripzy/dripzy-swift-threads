@@ -82,13 +82,24 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   };
 
   const handleClearAll = () => {
+    console.log('FilterModal - Clearing all filters');
     clearFilters();
   };
 
   const isTagSelected = (tag: string) => {
     const selected = filterState.selectedTags.includes(tag);
-    console.log(`FilterModal - Tag ${tag} selected:`, selected);
     return selected;
+  };
+
+  const handleCheckboxChange = (tag: string, checked: boolean) => {
+    console.log(`FilterModal - Checkbox ${tag} changed to:`, checked);
+    console.log('FilterModal - Current selectedTags before change:', filterState.selectedTags);
+    
+    if (checked) {
+      addFilter(tag);
+    } else {
+      removeFilter(tag);
+    }
   };
 
   const renderFilterSection = (title: string, options: { tag: string; display: string }[]) => (
@@ -96,8 +107,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
-          const isChecked = Boolean(isTagSelected(tag));
-          console.log(`FilterModal - Rendering ${tag}, isChecked:`, isChecked);
+          const isChecked = isTagSelected(tag);
           
           return (
             <div key={tag} className="flex items-center space-x-3">
@@ -105,24 +115,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                 type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  console.log(`Checkbox ${tag} toggled via native input:`, checked);
-                  console.log(`FilterModal - Before change, selectedTags:`, filterState.selectedTags);
-                  
-                  if (checked) {
-                    console.log(`FilterModal - Adding filter: ${tag}`);
-                    addFilter(tag);
-                  } else {
-                    console.log(`FilterModal - Removing filter: ${tag}`);
-                    removeFilter(tag);
-                  }
-                  
-                  // Add a small delay to see the effect
-                  setTimeout(() => {
-                    console.log(`FilterModal - After change, selectedTags:`, filterState.selectedTags);
-                  }, 100);
-                }}
+                onChange={(e) => handleCheckboxChange(tag, e.target.checked)}
                 className="accent-green-500 w-4 h-4 cursor-pointer"
               />
               <Label
@@ -138,18 +131,9 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
     </div>
   );
 
-  // Don't render anything if dialog is not open
-  if (!isOpen) {
-    console.log('FilterModal - Not rendering because isOpen is false');
-    return null;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        key={filterState.selectedTags.join(',')}
-        className="max-w-md max-h-[80vh] overflow-y-auto"
-      >
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
