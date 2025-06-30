@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -71,35 +71,43 @@ interface FilterModalProps {
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) => {
-  const { filterState, addFilter, removeFilter, clearFilters } = useFilter();
+  const { filterState, setFilters, clearFilters } = useFilter();
+  const [localTags, setLocalTags] = useState<string[]>([]);
 
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - isOpen:', isOpen);
+  console.log('FilterModal - Local tags:', localTags);
+
+  // Sync local state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('FilterModal - Syncing local tags with context:', filterState.selectedTags);
+      setLocalTags(filterState.selectedTags);
+    }
+  }, [isOpen, filterState.selectedTags]);
 
   const handleApply = () => {
+    console.log('FilterModal - Applying filters:', localTags);
+    setFilters(localTags); // Update context with local state
     onApply();
     onClose();
   };
 
   const handleClearAll = () => {
     console.log('FilterModal - Clearing all filters');
-    clearFilters();
+    setLocalTags([]); // Clear local state
+    clearFilters(); // Clear context
   };
 
-  const isTagSelected = (tag: string) => {
-    const selected = filterState.selectedTags.includes(tag);
-    return selected;
-  };
-
-  const handleCheckboxChange = (tag: string, checked: boolean) => {
-    console.log(`FilterModal - Checkbox ${tag} changed to:`, checked);
-    console.log('FilterModal - Current selectedTags before change:', filterState.selectedTags);
-    
-    if (checked) {
-      addFilter(tag);
-    } else {
-      removeFilter(tag);
-    }
+  const toggleTag = (tag: string) => {
+    console.log(`FilterModal - Toggling tag: ${tag}`);
+    setLocalTags(prev => {
+      const newTags = prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag];
+      console.log('FilterModal - New local tags:', newTags);
+      return newTags;
+    });
   };
 
   const renderFilterSection = (title: string, options: { tag: string; display: string }[]) => (
@@ -107,7 +115,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
-          const isChecked = isTagSelected(tag);
+          const isChecked = localTags.includes(tag);
           
           return (
             <div key={tag} className="flex items-center space-x-3">
@@ -115,7 +123,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                 type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onChange={(e) => handleCheckboxChange(tag, e.target.checked)}
+                onChange={() => toggleTag(tag)}
                 className="accent-green-500 w-4 h-4 cursor-pointer"
               />
               <Label
@@ -150,11 +158,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
         
         <div className="space-y-4">
           {/* Selected Filters Summary */}
-          {filterState.selectedTags.length > 0 && (
+          {localTags.length > 0 && (
             <div className="pb-4 border-b">
               <h3 className="font-semibold mb-2">Selected Filters</h3>
               <div className="flex flex-wrap gap-2">
-                {filterState.selectedTags.map(tag => {
+                {localTags.map(tag => {
                   const allOptions = [
                     ...FILTER_OPTIONS.gender,
                     ...FILTER_OPTIONS.category,
@@ -172,7 +180,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                       {displayName}
                       <X 
                         className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
-                        onClick={() => removeFilter(tag)}
+                        onClick={() => toggleTag(tag)}
                       />
                     </Badge>
                   );
