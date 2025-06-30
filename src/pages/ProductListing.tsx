@@ -406,7 +406,7 @@ const fetchProductsByTag = async ({
 
 const ProductListPage = () => {
   const [searchParams] = useSearchParams();
-const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = useFilter();
+  const { filterState, clearFilters, getQueryString, getSortKey } = useFilter();
   const collection = searchParams.get('collection');
   const searchQuery = searchParams.get('search');
   const tag = searchParams.get('tag');
@@ -416,31 +416,10 @@ const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = us
   console.log('ProductListPage - Tag parameter:', tag);
   console.log('ProductListPage - Filter state:', filterState);
 
-  // Initialize filters based on URL parameters
- useEffect(() => {
-  const initialTags: string[] = [];
-
-  if (searchQuery) {
-    const tagMatches = searchQuery.match(/tag:([^"]+?)(?:\s|$)/g);
-    if (tagMatches) {
-      tagMatches.forEach(match => {
-        const tag = match.replace('tag:', '').trim();
-        if (tag && !initialTags.includes(tag)) {
-          initialTags.push(tag);
-        }
-      });
-    }
-  } else if (tag) {
-    initialTags.push(tag);
-  }
-
-  if (initialTags.length > 0) {
-    setFilters(initialTags);
-  } else {
-    clearFilters(); // ✅ Clear if nothing passed in query
-  }
-}, [searchQuery, tag, setFilters, clearFilters]);
-
+  // Clear filters when component mounts - let users choose filters themselves
+  useEffect(() => {
+    clearFilters();
+  }, [clearFilters]);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -452,21 +431,39 @@ const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = us
     const sortKey = getSortKey();
     const reverse = filterState.sortBy === 'price-high';
     
-    // Combine search query with filter query
-    let finalQuery = filterQuery;
-    if (searchQuery && !filterQuery) {
-      finalQuery = searchQuery;
-    } else if (searchQuery && filterQuery) {
-      finalQuery = `${searchQuery} AND ${filterQuery}`;
+    // Build the final query combining URL tag with user-selected filters
+    let finalQuery = '';
+    
+    // If there's a tag from URL (like "Women's Wear"), include it
+    if (tag) {
+      finalQuery = `tag:${tag}`;
+    }
+    
+    // If user has selected filters, combine them
+    if (filterQuery) {
+      if (finalQuery) {
+        finalQuery = `${finalQuery} AND ${filterQuery}`;
+      } else {
+        finalQuery = filterQuery;
+      }
+    }
+    
+    // If there's a search query, combine it
+    if (searchQuery && !tag) {
+      if (finalQuery) {
+        finalQuery = `${searchQuery} AND ${finalQuery}`;
+      } else {
+        finalQuery = searchQuery;
+      }
     }
     
     console.log('Final query for Shopify:', finalQuery);
     
-    if (finalQuery || tag) {
+    if (finalQuery) {
       return ({ pageParam }: { pageParam?: string | null }) => 
         fetchSearchResults({ 
           pageParam, 
-          searchQuery: finalQuery || `tag:${tag}`, 
+          searchQuery: finalQuery, 
           sortKey, 
           reverse 
         });
@@ -491,26 +488,40 @@ const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = us
   };
 
   const getQueryKey = () => {
-  const filterQuery = getQueryString();
-  const sortKey = getSortKey();
-  const reverse = filterState.sortBy === 'price-high';
-  
-  let finalQuery = filterQuery;
-  if (searchQuery && !filterQuery) {
-    finalQuery = searchQuery;
-  } else if (searchQuery && filterQuery) {
-    finalQuery = `${searchQuery} AND ${filterQuery}`;
-  }
+    const filterQuery = getQueryString();
+    const sortKey = getSortKey();
+    const reverse = filterState.sortBy === 'price-high';
+    
+    let finalQuery = '';
+    
+    if (tag) {
+      finalQuery = `tag:${tag}`;
+    }
+    
+    if (filterQuery) {
+      if (finalQuery) {
+        finalQuery = `${finalQuery} AND ${filterQuery}`;
+      } else {
+        finalQuery = filterQuery;
+      }
+    }
+    
+    if (searchQuery && !tag) {
+      if (finalQuery) {
+        finalQuery = `${searchQuery} AND ${finalQuery}`;
+      } else {
+        finalQuery = searchQuery;
+      }
+    }
 
-  if (finalQuery || tag) {
-    return ['shopifySearchResults', finalQuery || `tag:${tag}`, sortKey, reverse, filterState.selectedTags.join(',')];
-  } else if (collection) {
-    return ['shopifyCollectionProducts', collection, sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
-  } else {
-    return ['shopifyProducts', sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
-  }
-};
-
+    if (finalQuery) {
+      return ['shopifySearchResults', finalQuery, sortKey, reverse, filterState.selectedTags.join(',')];
+    } else if (collection) {
+      return ['shopifyCollectionProducts', collection, sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
+    } else {
+      return ['shopifyProducts', sortKey, reverse, finalQuery, filterState.selectedTags.join(',')];
+    }
+  };
 
   const {
     data,
@@ -619,7 +630,6 @@ const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = us
             <ProductGrid products={products} isLoading={isLoading && products.length === 0} />
           )}
           
-          {/* This invisible div will trigger loading more products */}
           <div ref={loadMoreRef} />
 
           <div className="flex justify-center py-8">
