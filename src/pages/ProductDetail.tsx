@@ -1,161 +1,495 @@
-
-import { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2 } from 'lucide-react';
-import { products } from '@/data/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, ShoppingCart, Heart, Share } from 'lucide-react';
+import ImageCarousel from '../components/ImageCarousel';
+import { Button } from '../components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { auth } from '../firebase';
+import { cartService } from '../api/cartClient';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog';
+import CartIcon from '../components/header/CartIcon';
 
-const ProductDetail = () => {
-  const { id } = useParams();
+// Interfaces for Shopify data
+interface ShopifyImageNode {
+  url: string;
+  altText: string | null;
+}
+
+interface ShopifyPrice {
+  amount: string;
+  currencyCode: string;
+}
+
+interface ShopifyVariantNode {
+  id: string;
+  title: string;
+  price: ShopifyPrice;
+  image: ShopifyImageNode | null;
+  selectedOptions: {
+    name: string;
+    value: string;
+  }[];
+}
+
+interface ShopifyProduct {
+  id: string;
+  title: string;
+  descriptionHtml: string;
+  vendor: string;
+  options: {
+    id: string;
+    name: string;
+    values: string[];
+  }[];
+  images: { edges: { node: ShopifyImageNode }[] };
+  variants: { edges: { node: ShopifyVariantNode }[] };
+}
+
+const SHOPIFY_STOREFRONT_ACCESS_TOKEN = '50b756b36c591cc2d86ea31b1eceace5';
+const SHOPIFY_API_URL = 'https://sycfx9-af.myshopify.com/api/2025-04/graphql.json';
+
+const getProductByIdQuery = `
+  query GetProductById($id: ID!) {
+    product(id: $id) {
+      id
+      title
+      descriptionHtml
+      vendor
+      options {
+        id
+        name
+        values
+      }
+      images(first: 250) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+      variants(first: 250) {
+        edges {
+          node {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            image {
+              url
+              altText
+            }
+            selectedOptions {
+              name
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const fetchProductFromShopify = async (productId: string): Promise<ShopifyProduct> => {
+  const fullProductId = `gid://shopify/Product/${productId}`;
+  const response = await fetch(SHOPIFY_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+    },
+    body: JSON.stringify({
+      query: getProductByIdQuery,
+      variables: { id: fullProductId },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error("Shopify API Error:", errorBody);
+    throw new Error('Failed to fetch product from Shopify.');
+  }
+
+  const json = await response.json();
+  if (json.data?.product) {
+    return json.data.product;
+  }
+
+  console.error("Unexpected Shopify API response structure:", json);
+  throw new Error("Unexpected response structure from Shopify.");
+};
+
+const ProductDetailPage = () => {
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const product = products.find(p => p.id === id);
-  const [selectedSize, setSelectedSize] = useState('');
+
+  const { data: product, isLoading, error } = useQuery<ShopifyProduct, Error>({
+    queryKey: ['shopifyProduct', productId],
+    queryFn: () => fetchProductFromShopify(productId!),
+    enabled: !!productId,
+  });
+
+  const colorOption = useMemo(() => product?.options.find(opt => opt.name.toLowerCase() === 'color'), [product]);
+  const sizeOption = useMemo(() => product?.options.find(opt => opt.name.toLowerCase() === 'size'), [product]);
+
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [showSizeDialog, setShowSizeDialog] = useState(false);
 
-  // Mock additional images
-  const productImages = product ? [
-    product.image,
-    product.image.replace('w=400', 'w=500'),
-    product.image.replace('h=600', 'h=700'),
-    product.image.replace('fit=crop', 'fit=cover'),
-    product.image.replace('400', '450')
-  ] : [];
+  useEffect(() => {
+    if (colorOption?.values.length && !selectedColor) {
+      setSelectedColor(colorOption.values[0]);
+    }
+  }, [colorOption, selectedColor]);
 
-  if (!product) {
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+    setSelectedSize(''); // Reset size selection when color changes
+  };
+
+  const handleSizeChange = (size: string) => {
+    setSelectedSize(size);
+  };
+
+  const handleBack = () => {
+    navigate('/products');
+  };
+
+  const toggleWishlist = () => {
+    setIsWishlisted(!isWishlisted);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product?.title,
+        text: `Check out this product from ${product?.vendor}`,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied!",
+        description: "Product link copied to clipboard.",
+      });
+    }
+  };
+
+  const handleAddToBag = async () => {
+    if (sizeOption && !selectedSize) {
+      setShowSizeDialog(true);
+      return;
+    }
+
+    if (!auth.currentUser) {
+      navigate('/auth', { state: { from: window.location.pathname } });
+      return;
+    }
+
+    try {
+      console.log('Adding to bag:', {
+        productId: product?.id,
+        variantId: selectedVariant?.id,
+        color: selectedColor,
+        size: selectedSize,
+      });
+
+      // Use the selected variant ID or fallback to product ID
+      const variantId = selectedVariant?.id || `gid://shopify/ProductVariant/${productId}`;
+      
+      await cartService.mutateCart(variantId, 1);
+
+      toast({
+        title: "Added to Bag",
+        description: `${product?.title}${selectedSize ? ` (Size: ${selectedSize})` : ''} added to your bag`,
+      });
+    } catch (error: any) {
+      console.error('Failed to add to bag:', error);
+      toast({
+        title: "Add to Bag Failed",
+        description: error.message || "Failed to add item to bag",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const availableSizes = useMemo(() => {
+    if (!sizeOption) return [];
+    if (!colorOption || !selectedColor) {
+      const allSizes = product?.variants.edges.map(edge =>
+        edge.node.selectedOptions.find(opt => opt.name === sizeOption.name)?.value
+      );
+      return [...new Set(allSizes)].filter(Boolean) as string[];
+    }
+
+    const sizesForColor = product?.variants.edges
+      .filter(edge =>
+        edge.node.selectedOptions.some(opt => opt.name === colorOption.name && opt.value === selectedColor)
+      )
+      .map(edge =>
+        edge.node.selectedOptions.find(opt => opt.name === sizeOption.name)?.value
+      );
+
+    return [...new Set(sizesForColor)].filter(Boolean) as string[];
+  }, [product, selectedColor, colorOption, sizeOption]);
+
+  const selectedVariant = useMemo(() => {
+    if (!product) return null;
+    
+    return product.variants.edges.find(edge => {
+      const { node } = edge;
+      const options = node.selectedOptions;
+
+      const colorMatch = !colorOption || options.some(opt => opt.name === colorOption.name && opt.value === selectedColor);
+      const sizeMatch = !sizeOption || options.some(opt => opt.name === sizeOption.name && opt.value === selectedSize);
+
+      if (sizeOption && !selectedSize) return false;
+
+      if (colorOption && sizeOption) {
+        return options.some(o => o.name === colorOption.name && o.value === selectedColor) &&
+               options.some(o => o.name === sizeOption.name && o.value === selectedSize);
+      }
+      return colorMatch && sizeMatch;
+
+    })?.node;
+  }, [product, selectedColor, selectedSize, colorOption, sizeOption]);
+
+  const getColorImage = (colorValue: string) => {
+    if (!product || !colorOption) return '/placeholder.svg';
+    const variantWithColor = product.variants.edges.find(edge => 
+        edge.node.selectedOptions.some(opt => opt.name === colorOption.name && opt.value === colorValue) && edge.node.image
+    );
+    return variantWithColor?.node.image?.url || product.images.edges[0]?.node.url || '/placeholder.svg';
+  }
+
+  const currentImages = useMemo(() => {
+    if (!selectedColor || !product) {
+      return product?.images.edges.map(e => e.node.url) ?? [];
+    }
+
+    const allProductImages = product.images.edges.map(e => e.node);
+
+    // 1. Get images from product.images with alt text matching selectedColor
+    const imagesByAltText = allProductImages.filter(
+      img => img.altText?.toLowerCase() === selectedColor.toLowerCase()
+    );
+
+    // 2. Get images from variants that match the selectedColor
+    const variantImages = product.variants.edges
+      .filter(edge =>
+        edge.node.selectedOptions.some(
+          opt =>
+            opt.name.toLowerCase() === 'color' &&
+            opt.value.toLowerCase() === selectedColor.toLowerCase()
+        ) && edge.node.image
+      )
+      .map(edge => edge.node.image!);
+
+    // Combine and deduplicate
+    const combined = [...imagesByAltText, ...variantImages];
+    const uniqueImageUrls = [...new Set(combined.map(img => img.url))];
+
+    if (uniqueImageUrls.length > 0) {
+      return uniqueImageUrls;
+    }
+
+    // Fallback: if no specific images found for the color, show all product images
+    return allProductImages.map(img => img.url);
+  }, [product, selectedColor]);
+
+  if (isLoading) {
     return (
-      <div className="pt-16 pb-20 min-h-screen flex items-center justify-center">
-        <p>Product not found</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading product details...</p>
+        </div>
       </div>
     );
   }
 
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast({
-        title: "Please select a size",
-        description: "Choose your preferred size before adding to cart",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Added to cart!",
-      description: `${product.name} (Size: ${selectedSize}) added to your cart`,
-    });
-  };
+  if (error) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <p className="text-red-500">Error: {error.message}</p>
+        </div>
+    );
+  }
+  
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Product not found</p>
+          <Button onClick={handleBack} variant="outline">
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  const price = selectedVariant?.price.amount || product.variants.edges[0]?.node.price.amount;
 
   return (
-    <div className="pt-16 pb-20 min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button 
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setIsWishlisted(!isWishlisted)}
-            className={`p-2 rounded-full transition-colors ${
-              isWishlisted ? 'text-red-500 bg-red-50' : 'hover:bg-gray-100'
-            }`}
-          >
-            <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
-          </button>
-          <button className="p-2 hover:bg-gray-100 rounded-full">
-            <Share2 size={20} />
-          </button>
-        </div>
-      </div>
-
-      {/* Scrollable Image Gallery */}
-      <div className="relative">
-        <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-          {productImages.map((image, index) => (
-            <div
-              key={index}
-              className="aspect-square min-w-full snap-center overflow-hidden"
-            >
-              <img
-                src={image}
-                alt={`${product.name} ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-        
-        {/* Image indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-          {productImages.map((_, index) => (
-            <div
-              key={index}
-              className="w-2 h-2 rounded-full bg-white/70"
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Product Info */}
-      <div className="p-4">
-        <div className="mb-2">
-          <span className="text-sm text-gray-500">{product.brand}</span>
-        </div>
-        <h1 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h1>
-        <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-        
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
-          {product.originalPrice && (
-            <>
-              <span className="text-lg text-gray-500 line-through">₹{product.originalPrice}</span>
-              <span className="text-sm text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                {product.discount}% OFF
-              </span>
-            </>
-          )}
-        </div>
-
-        {/* Delivery Info */}
-        <div className="bg-green-50 text-green-700 px-3 py-2 rounded-lg mb-6">
-          <p className="text-sm font-medium">Get it in {product.deliveryTime}</p>
-        </div>
-
-        {/* Size Selection */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Select Size</h3>
-          <div className="flex flex-wrap gap-2">
-            {product.sizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 border rounded-lg transition-colors ${
-                  selectedSize === size
-                    ? 'border-green-500 bg-green-50 text-green-500'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Add to Cart Button */}
+      <header className="flex items-center justify-between p-4 border-b">
         <button
-          onClick={handleAddToCart}
-          className="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
+          onClick={handleBack}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Go back"
         >
-          Add to Cart
+          <ArrowLeft size={24} />
         </button>
+        <h1 className="text-lg font-medium truncate max-w-[60vw]">{product.title}</h1>
+        <div className="flex items-center space-x-2">
+          <CartIcon />
+        </div>
+      </header>
+  
+      {/* Product Image Carousel */}
+      <div className="relative">
+        <ImageCarousel images={currentImages} autoPlay={true} />
+        
+        {/* Floating Action Buttons */}
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 space-y-3">
+          <button
+            onClick={toggleWishlist}
+            className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+            aria-label="Add to wishlist"
+          >
+            <Heart
+              size={20}
+              className={isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600'}
+            />
+          </button>
+          <button
+            onClick={handleShare}
+            className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+            aria-label="Share product"
+          >
+            <Share size={20} className="text-gray-600" />
+          </button>
+        </div>
       </div>
+  
+      {/* Product Information */}
+      <div className="p-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          {product.vendor}
+        </h2>
+        
+        <p className="text-gray-600 text-sm mb-4">
+          {product.title}
+        </p>
+  
+        {product.descriptionHtml && (
+          <div 
+            className="text-gray-600 text-sm mb-4 prose"
+            dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+          />
+        )}
+  
+        {/* Color Variants */}
+        {colorOption && colorOption.values.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">Colors Available</h3>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide p-1">
+              {colorOption.values.map((color, index) => (
+                <div
+                  key={index}
+                  className="text-center cursor-pointer flex-shrink-0"
+                  onClick={() => handleColorChange(color)}
+                >
+                  <div className={`w-14 h-18 rounded-lg overflow-hidden border-2 mb-2 transition-all duration-200 ${
+                    selectedColor === color ? 'border-black scale-105' : 'border-gray-200 hover:border-gray-400'
+                  }`}>
+                    <img
+                      src={getColorImage(color)}
+                      alt={color}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-600 max-w-14 truncate">
+                    {color}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+  
+        {/* Size Selection */}
+        {sizeOption && availableSizes.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-900">Size</h3>
+              {!selectedSize && (
+                <span className="text-xs text-orange-600 animate-pulse">
+                  Please select a size
+                </span>
+              )}
+            </div>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide p-1">
+              {availableSizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleSizeChange(size)}
+                  className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xs font-medium transition-all duration-200 flex-shrink-0 ${
+                    selectedSize === size
+                      ? 'border-black bg-black text-white scale-105' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400 hover:scale-105'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+  
+      {/* Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between">
+        <div>
+          <div className="flex items-center space-x-2 mb-1">
+            <span className="text-lg font-bold text-gray-900">
+              ₹{price}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500">(Incl. Of All Taxes)</p>
+        </div>
+        <Button 
+          onClick={handleAddToBag}
+          className="px-8 py-3 text-base font-medium bg-black text-white hover:bg-gray-800 hover:scale-105 transition-all duration-200"
+          size="lg"
+        >
+          ADD TO BAG
+        </Button>
+      </div>
+
+      {/* Size Selection Dialog */}
+      <Dialog open={showSizeDialog} onOpenChange={setShowSizeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Size Required</DialogTitle>
+            <DialogDescription>
+              Please select a size before adding this item to your bag.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => setShowSizeDialog(false)} className="mt-4">
+            Got it
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default ProductDetail;
+export default ProductDetailPage;

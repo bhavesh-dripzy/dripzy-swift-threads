@@ -1,288 +1,534 @@
-
-import { Product, Category, User, Order } from '@/types';
-
-export const categories: Category[] = [
+// Mock data for the application
+export const categories = [
   {
     id: 'women',
     name: 'Women',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=400&fit=crop&crop=face',
-    subcategories: [
-      {
-        id: 'topwear',
-        name: 'Topwear',
-        icon: '👕',
-        types: [
-          { id: 't-shirts', name: 'T-Shirts', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=400&fit=crop', count: 150 },
-          { id: 'shirts', name: 'Shirts', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&h=400&fit=crop', count: 89 },
-          { id: 'tops', name: 'Tops', image: 'https://images.unsplash.com/photo-1594633313593-bab3825d0caf?w=300&h=400&fit=crop', count: 120 }
-        ]
-      },
-      {
-        id: 'bottomwear',
-        name: 'Bottomwear',
-        icon: '👖',
-        types: [
-          { id: 'jeans', name: 'Jeans', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&h=400&fit=crop', count: 200 },
-          { id: 'skirts', name: 'Skirts', image: 'https://images.unsplash.com/photo-1583496661160-fb5886a13d76?w=300&h=400&fit=crop', count: 75 }
-        ]
-      },
-      {
-        id: 'dresses',
-        name: 'Dresses',
-        icon: '👗',
-        types: [
-          { id: 'casual-dresses', name: 'Casual Dresses', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=400&fit=crop', count: 95 },
-          { id: 'party-dresses', name: 'Party Dresses', image: 'https://images.unsplash.com/photo-1566479179817-c0acb28c4ec5?w=300&h=400&fit=crop', count: 60 }
-        ]
-      }
-    ]
+    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=100&h=100&fit=crop&crop=face'
   },
   {
     id: 'men',
     name: 'Men',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&crop=face',
-    subcategories: [
-      {
-        id: 'topwear',
-        name: 'Topwear',
-        icon: '👔',
-        types: [
-          { id: 't-shirts', name: 'T-Shirts', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=400&fit=crop', count: 180 },
-          { id: 'shirts', name: 'Shirts', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&h=400&fit=crop', count: 120 },
-          { id: 'hoodies', name: 'Hoodies', image: 'https://images.unsplash.com/photo-1556821840-3a9909d96c38?w=300&h=400&fit=crop', count: 90 }
-        ]
-      },
-      {
-        id: 'bottomwear',
-        name: 'Bottomwear',
-        icon: '👖',
-        types: [
-          { id: 'jeans', name: 'Jeans', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&h=400&fit=crop', count: 220 },
-          { id: 'trousers', name: 'Trousers', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=400&fit=crop', count: 85 }
-        ]
-      }
-    ]
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
   },
   {
     id: 'footwear',
     name: 'Footwear',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop',
-    subcategories: [
-      {
-        id: 'casual',
-        name: 'Casual',
-        icon: '👟',
-        types: [
-          { id: 'sneakers', name: 'Sneakers', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=400&fit=crop', count: 150 },
-          { id: 'loafers', name: 'Loafers', image: 'https://images.unsplash.com/photo-1573913636631-dc4fc5cd8293?w=300&h=400&fit=crop', count: 80 }
-        ]
-      }
-    ]
+    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=100&h=100&fit=crop'
   },
   {
     id: 'accessories',
     name: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop',
-    subcategories: [
-      {
-        id: 'eyewear',
-        name: 'Eyewear',
-        icon: '🕶️',
-        types: [
-          { id: 'sunglasses', name: 'Sunglasses', image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300&h=400&fit=crop', count: 120 },
-          { id: 'glasses', name: 'Glasses', image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=300&h=400&fit=crop', count: 95 }
-        ]
-      }
-    ]
+    image: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=100&h=100&fit=crop'
   }
 ];
 
-export const products: Product[] = [
-  {
-    id: '1',
-    name: 'Classic White Sneakers',
-    brand: 'Zara',
-    price: 2999,
-    originalPrice: 3999,
-    discount: 25,
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=600&fit=crop',
-    category: 'footwear',
-    subcategory: 'sneakers',
-    sizes: ['6', '7', '8', '9', '10'],
-    description: 'Comfortable white sneakers perfect for everyday wear',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '2',
-    name: 'Denim Jacket',
-    brand: 'H&M',
-    price: 1999,
-    image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=600&fit=crop',
-    category: 'women',
-    subcategory: 'topwear',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    description: 'Classic denim jacket for a timeless look',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '3',
-    name: 'Black Formal Shirt',
-    brand: 'Jockey',
-    price: 1499,
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=600&fit=crop',
-    category: 'men',
-    subcategory: 'topwear',
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    description: 'Premium cotton formal shirt for office wear',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '4',
-    name: 'Aviator Sunglasses',
-    brand: 'Zara',
-    price: 899,
-    originalPrice: 1299,
-    discount: 31,
-    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=600&fit=crop',
-    category: 'accessories',
-    subcategory: 'eyewear',
-    sizes: ['One Size'],
-    description: 'Classic aviator sunglasses with UV protection',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '5',
-    name: 'Summer Floral Dress',
-    brand: 'H&M',
-    price: 2499,
-    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=600&fit=crop',
-    category: 'women',
-    subcategory: 'dresses',
-    sizes: ['XS', 'S', 'M', 'L'],
-    description: 'Beautiful floral dress perfect for summer',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '6',
-    name: 'Casual Gray Hoodie',
-    brand: 'Jockey',
-    price: 1799,
-    image: 'https://images.unsplash.com/photo-1556821840-3a9909d96c38?w=400&h=600&fit=crop',
-    category: 'men',
-    subcategory: 'topwear',
-    sizes: ['S', 'M', 'L', 'XL'],
-    description: 'Comfortable cotton hoodie for casual wear',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '7',
-    name: 'Blue Skinny Jeans',
-    brand: 'Zara',
-    price: 2299,
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&h=600&fit=crop',
-    category: 'women',
-    subcategory: 'bottomwear',
-    sizes: ['26', '28', '30', '32', '34'],
-    description: 'Trendy blue skinny jeans with stretch fabric',
-    deliveryTime: '30 min'
-  },
-  {
-    id: '8',
-    name: 'Brown Leather Loafers',
-    brand: 'H&M',
-    price: 3499,
-    image: 'https://images.unsplash.com/photo-1573913636631-dc4fc5cd8293?w=400&h=600&fit=crop',
-    category: 'footwear',
-    subcategory: 'casual',
-    sizes: ['6', '7', '8', '9', '10', '11'],
-    description: 'Premium leather loafers for smart casual look',
-    deliveryTime: '30 min'
-  }
-];
-
-export const mockUser: User = {
-  id: '1',
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '+91 9876543210',
-  addresses: [
+export const banners = {
+  women: [
     {
-      id: '1',
-      type: 'Home',
-      line1: '123 Green Park',
-      line2: 'Near Metro Station',
-      city: 'New Delhi',
-      state: 'Delhi',
-      pincode: '110016',
-      isDefault: true
+      title: "Ethnic Collection",
+      subtitle: "UPTO 70% OFF - SHOP NOW",
+      image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&h=400&fit=crop"
     },
     {
-      id: '2',
-      type: 'Office',
-      line1: '456 Connaught Place',
-      city: 'New Delhi',
-      state: 'Delhi',
-      pincode: '110001',
-      isDefault: false
+      title: "Western Wear",
+      subtitle: "New Arrivals - Trendy Styles",
+      image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&h=400&fit=crop"
+    }
+  ],
+  men: [
+    {
+      title: "Formal Collection",
+      subtitle: "Premium Shirts & Blazers",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop"
+    },
+    {
+      title: "Casual Wear",
+      subtitle: "Comfortable & Stylish",
+      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop"
+    }
+  ],
+  footwear: [
+    {
+      title: "Sneaker Collection",
+      subtitle: "Latest Styles Available",
+      image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=400&fit=crop"
+    },
+    {
+      title: "Formal Shoes",
+      subtitle: "Office Ready Footwear",
+      image: "https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=800&h=400&fit=crop"
+    }
+  ],
+  accessories: [
+    {
+      title: "Bags & Wallets",
+      subtitle: "Premium Leather Collection",
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=400&fit=crop"
+    },
+    {
+      title: "Watches & Jewelry",
+      subtitle: "Elegant Timepieces",
+      image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&h=400&fit=crop"
     }
   ]
 };
 
-export const mockOrders: Order[] = [
+// Hero images for ProductGrid sections by category
+export const heroImages = {
+  women: {
+    quickPicks: {
+      image: "/lovable-uploads/ecaaf61b-2105-4c36-8464-0d14580e5913.png",
+      title: "SEASON'S STANDOUT"
+    },
+    trending: {
+      image: "/lovable-uploads/ed93d5d3-7dfc-435d-b618-f1ec8b6380b5.png",
+      title: "Products you can't miss"
+    }
+  },
+  men: {
+    quickPicks: {
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop",
+      title: "MEN'S ESSENTIALS"
+    },
+    trending: {
+      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop",
+      title: "Trending men's styles"
+    }
+  },
+  footwear: {
+    quickPicks: {
+      image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=400&fit=crop",
+      title: "STEP IN STYLE"
+    },
+    trending: {
+      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=400&fit=crop",
+      title: "Latest footwear trends"
+    }
+  },
+  accessories: {
+    quickPicks: {
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=400&fit=crop",
+      title: "ACCESSORY PICKS"
+    },
+    trending: {
+      image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&h=400&fit=crop",
+      title: "Must-have accessories"
+    }
+  }
+};
+
+// Featured Categories for each main category
+export const featuredCategories = {
+  women: [
+    {
+      id: 'deal-women',
+      name: 'SNITCH DEAL OF THE DAY',
+      subtitle: 'UP TO 40% OFF*',
+      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&h=400&fit=crop',
+      isDeal: true
+    },
+    {
+      id: 'new-arrivals-women',
+      name: 'NEW ARRIVALS',
+      image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'dresses',
+      name: 'DRESSES',
+      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'kurtis',
+      name: 'KURTIS',
+      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'tops-women',
+      name: 'TOPS',
+      image: '/lovable-uploads/b99f6ddd-7e0e-4350-8ad7-cf9871803b27.png',
+      collection: 'tops' // This maps to the Shopify "Tops" collection
+    },
+    {
+      id: 'jeans-women',
+      name: 'JEANS',
+      image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'skirts',
+      name: 'SKIRTS',
+      image: '/lovable-uploads/0cff6b78-99d4-48a8-a295-5bb972aa9d6d.png'
+    },
+    {
+      id: 'ethnic-women',
+      name: 'ETHNIC WEAR',
+      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'plus-size-women',
+      name: 'PLUS SIZE',
+      image: '/lovable-uploads/eca9ad5a-9d61-4827-bf3c-e5457cc2030f.png'
+    },
+    {
+      id: 'luxe-women',
+      name: 'LUXE',
+      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'under-999-women',
+      name: 'UNDER ₹999',
+      subtitle: '₹999',
+      image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=400&fit=crop',
+      isPriceCategory: true
+    }
+  ],
+  men: [
+    {
+      id: 'deal-men',
+      name: 'SNITCH DEAL OF THE DAY',
+      subtitle: 'UP TO 40% OFF*',
+      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=400&fit=crop',
+      isDeal: true
+    },
+    {
+      id: 'new-arrivals-men',
+      name: 'NEW ARRIVALS',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'shirts-men',
+      name: 'SHIRTS',
+      image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'trousers',
+      name: 'TROUSERS',
+      image: 'https://images.unsplash.com/photo-1506629905543-2ad2bb0b9348?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'cargo-pants',
+      name: 'CARGO PANTS',
+      image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'polo-tshirts',
+      name: 'POLO T-SHIRTS',
+      image: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'graphic-tees',
+      name: 'GRAPHIC TEES',
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'baggy-jeans',
+      name: 'BAGGY JEANS',
+      image: 'https://images.unsplash.com/photo-1542272454315-7ad9f1ba8b80?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'essentials-men',
+      name: 'ESSENTIALS',
+      image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'plus-size-men',
+      name: 'PLUS SIZE',
+      image: 'https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'luxe-men',
+      name: 'LUXE',
+      image: 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'under-999-men',
+      name: 'UNDER ₹999',
+      subtitle: '₹999',
+      image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop',
+      isPriceCategory: true
+    }
+  ],
+  kids: [
+    {
+      id: 'deal-kids',
+      name: 'KIDS DEAL OF THE DAY',
+      subtitle: 'UP TO 40% OFF*',
+      image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=300&h=400&fit=crop',
+      isDeal: true
+    },
+    {
+      id: 'boys-collection',
+      name: 'BOYS COLLECTION',
+      image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'girls-collection',
+      name: 'GIRLS COLLECTION',
+      image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'baby-collection',
+      name: 'BABY COLLECTION',
+      image: 'https://images.unsplash.com/photo-1522771930-78848d9293e8?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'toys-games',
+      name: 'TOYS & GAMES',
+      image: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'school-wear',
+      name: 'SCHOOL WEAR',
+      image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=300&h=400&fit=crop'
+    }
+  ],
+  accessories: [
+    {
+      id: 'deal-accessories',
+      name: 'ACCESSORIES DEAL',
+      subtitle: 'UP TO 40% OFF*',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop',
+      isDeal: true
+    },
+    {
+      id: 'bags',
+      name: 'BAGS',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'watches',
+      name: 'WATCHES',
+      image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'jewelry',
+      name: 'JEWELRY',
+      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=400&fit=crop'
+    },
+    {
+      id: 'sunglasses',
+      name: 'SUNGLASSES',
+      image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&h=300&fit=crop'
+    },
+    {
+      id: 'wallets',
+      name: 'WALLETS',
+      image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=300&h=400&fit=crop'
+    }
+  ]
+};
+
+export const products = {
+  women: [
+    {
+      id: 'w1',
+      name: 'Floral Print Dress',
+      price: 1299,
+      originalPrice: 1999,
+      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=400&fit=crop',
+      brand: 'H&M',
+      category: 'women',
+      subcategory: 'dresses'
+    },
+    {
+      id: 'w2',
+      name: 'High-Waist Skinny Jeans',
+      price: 1999,
+      originalPrice: 2999,
+      image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&h=400&fit=crop',
+      brand: 'Zara',
+      category: 'women',
+      subcategory: 'jeans'
+    },
+    {
+      id: 'w3',
+      name: 'Silk Ethnic Kurti',
+      price: 2499,
+      originalPrice: 3499,
+      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=400&fit=crop',
+      brand: 'Jockey',
+      category: 'women',
+      subcategory: 'ethnic'
+    }
+  ],
+  men: [
+    {
+      id: 'm1',
+      name: 'Cotton Formal Shirt',
+      price: 1599,
+      originalPrice: 2299,
+      image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop',
+      brand: 'H&M',
+      category: 'men',
+      subcategory: 'shirts'
+    },
+    {
+      id: 'm2',
+      name: 'Slim Fit Chinos',
+      price: 1899,
+      originalPrice: 2599,
+      image: 'https://images.unsplash.com/photo-1506629905543-2ad2bb0b9348?w=300&h=400&fit=crop',
+      brand: 'Zara',
+      category: 'men',
+      subcategory: 'trousers'
+    },
+    {
+      id: 'm3',
+      name: 'Graphic Print T-Shirt',
+      price: 899,
+      originalPrice: 1299,
+      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=400&fit=crop',
+      brand: 'Jockey',
+      category: 'men',
+      subcategory: 'tshirts'
+    }
+  ],
+  footwear: [
+    {
+      id: 'f1',
+      name: 'White Sneakers',
+      price: 2999,
+      originalPrice: 3999,
+      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=400&fit=crop',
+      brand: 'H&M',
+      category: 'footwear',
+      subcategory: 'sneakers'
+    },
+    {
+      id: 'f2',
+      name: 'Leather Boots',
+      price: 4999,
+      originalPrice: 6999,
+      image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=300&h=400&fit=crop',
+      brand: 'Zara',
+      category: 'footwear',
+      subcategory: 'boots'
+    }
+  ],
+  accessories: [
+    {
+      id: 'a1',
+      name: 'Leather Handbag',
+      price: 3999,
+      originalPrice: 5999,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop',
+      brand: 'H&M',
+      category: 'accessories',
+      subcategory: 'bags'
+    },
+    {
+      id: 'a2',
+      name: 'Classic Watch',
+      price: 7999,
+      originalPrice: 9999,
+      image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=300&h=400&fit=crop',
+      brand: 'Zara',
+      category: 'accessories',
+      subcategory: 'watches'
+    }
+  ]
+};
+
+export const quickPicks = [
   {
-    id: 'ORD001',
-    date: '2024-06-01',
-    items: [
-      {
-        product: products[0],
-        size: '8',
-        quantity: 1
-      }
-    ],
-    total: 2999,
-    status: 'Delivered',
-    deliveryTime: '28 min'
+    id: 'q1',
+    name: 'Basic White Tee',
+    price: 599,
+    originalPrice: 899,
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=400&fit=crop',
+    brand: 'H&M'
   },
   {
-    id: 'ORD002',
-    date: '2024-05-28',
-    items: [
-      {
-        product: products[1],
-        size: 'M',
-        quantity: 1
-      },
-      {
-        product: products[3],
-        size: 'One Size',
-        quantity: 1
-      }
-    ],
-    total: 2898,
-    status: 'Delivered',
-    deliveryTime: '25 min'
+    id: 'q2',
+    name: 'Blue Denim Jacket',
+    price: 1999,
+    originalPrice: 2999,
+    image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=400&fit=crop',
+    brand: 'Zara'
+  },
+  {
+    id: 'q3',
+    name: 'Black Casual Shoes',
+    price: 2499,
+    originalPrice: 3499,
+    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=400&fit=crop',
+    brand: 'Jockey'
+  },
+  {
+    id: 'q4',
+    name: 'Cotton Polo Shirt',
+    price: 1299,
+    originalPrice: 1799,
+    image: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=300&h=400&fit=crop',
+    brand: 'H&M'
   }
 ];
 
-export const bannerContent = {
-  women: {
-    title: 'YOUR NEXT STATEMENT FIT',
-    subtitle: 'Trending styles delivered in 30 minutes',
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=400&fit=crop'
+export const trendingProducts = [
+  {
+    id: 't1',
+    name: 'Oversized Hoodie',
+    price: 1799,
+    originalPrice: 2599,
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=400&fit=crop',
+    brand: 'Zara'
   },
-  men: {
-    title: 'ELEVATE YOUR STYLE',
-    subtitle: 'Premium menswear at your doorstep',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop'
+  {
+    id: 't2',
+    name: 'High-Waist Jeans',
+    price: 2199,
+    originalPrice: 2999,
+    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&h=400&fit=crop',
+    brand: 'H&M'
   },
-  footwear: {
-    title: 'STEP INTO COMFORT',
-    subtitle: 'Latest footwear trends delivered fast',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=400&fit=crop'
+  {
+    id: 't3',
+    name: 'Sneaker Collection',
+    price: 3499,
+    originalPrice: 4999,
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=400&fit=crop',
+    brand: 'Jockey'
   },
-  accessories: {
-    title: 'COMPLETE YOUR LOOK',
-    subtitle: 'Accessories that make a difference',
-    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=400&fit=crop'
+  {
+    id: 't4',
+    name: 'Floral Summer Dress',
+    price: 1599,
+    originalPrice: 2299,
+    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=400&fit=crop',
+    brand: 'Zara'
   }
-};
+];
+
+export const justInProducts = [
+  {
+    id: 'j1',
+    name: 'Minimalist Watch',
+    price: 4999,
+    originalPrice: 6999,
+    image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=300&h=400&fit=crop',
+    brand: 'H&M'
+  },
+  {
+    id: 'j2',
+    name: 'Designer Handbag',
+    price: 5999,
+    originalPrice: 7999,
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop',
+    brand: 'Zara'
+  },
+  {
+    id: 'j3',
+    name: 'Premium Sunglasses',
+    price: 2999,
+    originalPrice: 3999,
+    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300&h=400&fit=crop',
+    brand: 'Jockey'
+  },
+  {
+    id: 'j4',
+    name: 'Leather Wallet',
+    price: 1499,
+    originalPrice: 1999,
+    image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=300&h=400&fit=crop',
+    brand: 'H&M'
+  }
+];
