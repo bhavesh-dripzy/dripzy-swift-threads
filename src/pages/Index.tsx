@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import Header from '../components/Header';
 import YellowBanner from '../components/YellowBanner';
@@ -25,13 +25,8 @@ interface CartItem extends LegacyProduct {
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
-  const { setFilters, clearFilters } = useFilter();
+  const { setFilters } = useFilter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  
-  // Clear filters when returning to home page
-  useEffect(() => {
-    clearFilters();
-  }, [clearFilters]);
   
   const handleAddToCart = (product: LegacyProduct) => {
     const existingItem = cartItems.find(item => item.id === product.id);
