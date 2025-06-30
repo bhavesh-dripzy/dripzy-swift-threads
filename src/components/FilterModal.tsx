@@ -1,9 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { useFilter } from '../contexts/FilterContext';
@@ -72,33 +71,42 @@ interface FilterModalProps {
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) => {
-  const { filterState, addFilter, removeFilter, clearFilters } = useFilter();
+  const { filterState, setFilters, clearFilters } = useFilter();
+  const [localTags, setLocalTags] = useState<string[]>([]);
 
   console.log('FilterModal - Current filter state:', filterState);
+  console.log('FilterModal - Local tags:', localTags);
 
-  const handleTagToggle = (tag: string) => {
-    console.log('FilterModal - Toggling tag:', tag, 'Current selected:', filterState.selectedTags);
-    
-    if (filterState.selectedTags.includes(tag)) {
-      removeFilter(tag);
-    } else {
-      addFilter(tag);
+  // Sync local state when modal opens or filter state changes
+  useEffect(() => {
+    if (isOpen) {
+      setLocalTags(filterState.selectedTags);
     }
+  }, [isOpen, filterState.selectedTags]);
+
+  const toggleTag = (tag: string) => {
+    console.log('FilterModal - Toggling tag:', tag);
+    setLocalTags(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
   };
 
   const handleApply = () => {
+    console.log('FilterModal - Applying filters:', localTags);
+    setFilters(localTags); // update context
     onApply();
     onClose();
   };
 
   const handleClearAll = () => {
+    setLocalTags([]);
     clearFilters();
   };
 
-  const isTagSelected = (tag: string) => {
-    const selected = filterState.selectedTags.includes(tag);
-    console.log(`FilterModal - Tag ${tag} selected:`, selected);
-    return selected;
+  const handleRemoveTag = (tag: string) => {
+    setLocalTags(prev => prev.filter(t => t !== tag));
   };
 
   const renderFilterSection = (title: string, options: { tag: string; display: string }[]) => (
@@ -106,24 +114,20 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
-          const isChecked = isTagSelected(tag);
+          const isChecked = localTags.includes(tag);
           return (
             <div key={tag} className="flex items-center space-x-3">
-              <Checkbox
+              <input
+                type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onCheckedChange={() => {
-                  console.log(`Checkbox ${tag} toggled, was:`, isChecked);
-                  handleTagToggle(tag);
-                }}
+                onChange={() => toggleTag(tag)}
+                className="accent-green-500 w-4 h-4"
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-                onClick={() => {
-                  console.log(`Label clicked for ${tag}`);
-                  handleTagToggle(tag);
-                }}
+                onClick={() => toggleTag(tag)}
               >
                 {display}
               </Label>
@@ -153,11 +157,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
         
         <div className="space-y-4">
           {/* Selected Filters Summary */}
-          {filterState.selectedTags.length > 0 && (
+          {localTags.length > 0 && (
             <div className="pb-4 border-b">
               <h3 className="font-semibold mb-2">Selected Filters</h3>
               <div className="flex flex-wrap gap-2">
-                {filterState.selectedTags.map(tag => {
+                {localTags.map(tag => {
                   const allOptions = [
                     ...FILTER_OPTIONS.gender,
                     ...FILTER_OPTIONS.category,
@@ -175,7 +179,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                       {displayName}
                       <X 
                         className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
-                        onClick={() => removeFilter(tag)}
+                        onClick={() => handleRemoveTag(tag)}
                       />
                     </Badge>
                   );
