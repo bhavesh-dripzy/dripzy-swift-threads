@@ -69,7 +69,7 @@ const Index: React.FC = () => {
     const tag = categoryToTagMap[categoryName];
     if (tag) {
       setFilters([tag]);
-      navigate(`/products?tag=${encodeURIComponent(tag)}`);
+      navigate('/products'); // Navigate without URL parameters
     } else {
       navigate('/products');
     }
