@@ -527,7 +527,8 @@ const ProductListPage = () => {
   });
 
   const handleFilterChange = () => {
-    console.log('Filter changed, refetching...');
+    console.log('Filter changed, refetching with new filters:', filterState.selectedTags);
+    // Force refetch with new query key
     refetch();
   };
 

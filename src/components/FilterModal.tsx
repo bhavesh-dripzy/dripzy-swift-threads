@@ -77,13 +77,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - Local tags:', localTags);
 
-  // Sync local state ONLY when modal opens - remove filterState.selectedTags dependency
+  // Sync local state ONLY when modal opens
   useEffect(() => {
     if (isOpen) {
       console.log('FilterModal - Modal opened, syncing local tags with:', filterState.selectedTags);
       setLocalTags([...filterState.selectedTags]);
     }
-  }, [isOpen]); // Remove filterState.selectedTags from dependency array
+  }, [isOpen, filterState.selectedTags]); // Keep filterState.selectedTags to sync properly
 
   const toggleTag = (tag: string) => {
     console.log('FilterModal - Toggling tag:', tag);
@@ -98,9 +98,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   const handleApply = () => {
     console.log('FilterModal - Applying filters:', localTags);
-    setFilters(localTags); // update context
-    onApply();
-    onClose();
+    setFilters(localTags); // Update global context
+    
+    // Small delay to ensure state is updated before closing
+    setTimeout(() => {
+      onApply(); // Trigger refetch
+      onClose(); // Close modal
+    }, 100);
   };
 
   const handleClearAll = () => {
