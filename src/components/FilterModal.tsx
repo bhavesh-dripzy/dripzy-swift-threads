@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -72,28 +73,34 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   const { filterState, setFilters } = useFilter();
   const [localSelectedTags, setLocalSelectedTags] = useState<string[]>([]);
 
-  // Hydrate local state on modal open
+  // Initialize local state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setLocalSelectedTags(filterState.selectedTags);
+      console.log('Modal opened, syncing local state with:', filterState.selectedTags);
+      setLocalSelectedTags([...filterState.selectedTags]);
     }
-  }, [isOpen]);
+  }, [isOpen, filterState.selectedTags]);
 
   const toggleTag = (tag: string) => {
-    setLocalSelectedTags(prev =>
-      prev.includes(tag)
+    console.log('Toggling tag:', tag);
+    setLocalSelectedTags(prev => {
+      const newTags = prev.includes(tag)
         ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+        : [...prev, tag];
+      console.log('New local tags:', newTags);
+      return newTags;
+    });
   };
 
   const handleApply = () => {
+    console.log('Applying filters:', localSelectedTags);
     setFilters(localSelectedTags);
-    onApply(); // triggers query refetch etc.
+    onApply();
     onClose();
   };
 
   const handleClearAll = () => {
+    console.log('Clearing all filters');
     setLocalSelectedTags([]);
   };
 
@@ -101,23 +108,26 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
     <div className="mb-6">
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
-        {options.map(({ tag, display }) => (
-          <div key={tag} className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id={`checkbox-${tag}`}
-              checked={localSelectedTags.includes(tag)}
-              onChange={() => toggleTag(tag)}
-              className="accent-green-500 w-4 h-4"
-            />
-            <Label
-              htmlFor={`checkbox-${tag}`}
-              className="text-sm font-medium cursor-pointer flex-1"
-            >
-              {display}
-            </Label>
-          </div>
-        ))}
+        {options.map(({ tag, display }) => {
+          const isChecked = localSelectedTags.includes(tag);
+          return (
+            <div key={tag} className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id={`checkbox-${tag}`}
+                checked={isChecked}
+                onChange={() => toggleTag(tag)}
+                className="accent-green-500 w-4 h-4"
+              />
+              <Label
+                htmlFor={`checkbox-${tag}`}
+                className="text-sm font-medium cursor-pointer flex-1"
+              >
+                {display}
+              </Label>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
