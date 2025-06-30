@@ -112,16 +112,15 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               <Checkbox
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onCheckedChange={(checked) => {
-                  console.log(`Checkbox ${tag} changed to:`, checked);
+                onCheckedChange={() => {
+                  console.log(`Checkbox ${tag} toggled, was:`, isChecked);
                   handleTagToggle(tag);
                 }}
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   console.log(`Label clicked for ${tag}`);
                   handleTagToggle(tag);
                 }}
@@ -145,7 +144,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
-              className="text-orange-500 hover:text-orange-600"
+              className="text-green-500 hover:text-green-600"
             >
               Clear All
             </Button>
@@ -171,11 +170,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     <Badge
                       key={tag}
                       variant="default"
-                      className="bg-orange-500 text-white"
+                      className="bg-green-500 text-white"
                     >
                       {displayName}
                       <X 
-                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-orange-600 rounded-full" 
+                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
                         onClick={() => removeFilter(tag)}
                       />
                     </Badge>
@@ -202,7 +201,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           </Button>
           <Button
             onClick={handleApply}
-            className="flex-1 bg-orange-500 hover:bg-orange-600"
+            className="flex-1 bg-green-500 hover:bg-green-600"
           >
             Apply Filters
           </Button>
