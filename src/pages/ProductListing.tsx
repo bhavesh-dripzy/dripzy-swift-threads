@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -407,7 +406,7 @@ const fetchProductsByTag = async ({
 
 const ProductListPage = () => {
   const [searchParams] = useSearchParams();
-  const { filterState, setFilters, clearFilters, getQueryString, getSortKey } = useFilter();
+  const { filterState, setFilters, getQueryString, getSortKey } = useFilter();
   const collection = searchParams.get('collection');
   const searchQuery = searchParams.get('search');
   const tag = searchParams.get('tag');
@@ -416,14 +415,6 @@ const ProductListPage = () => {
   console.log('ProductListPage - Search parameter:', searchQuery);
   console.log('ProductListPage - Tag parameter:', tag);
   console.log('ProductListPage - Filter state:', filterState);
-
-  // Clear filters when component unmounts (navigating away)
-  useEffect(() => {
-    return () => {
-      console.log('ProductListPage unmounting, clearing filters');
-      clearFilters();
-    };
-  }, [clearFilters]);
 
   // Initialize filters based on URL parameters
   useEffect(() => {
