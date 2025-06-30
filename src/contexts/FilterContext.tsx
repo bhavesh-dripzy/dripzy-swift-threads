@@ -108,39 +108,35 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
     const queryParts: string[] = [];
 
     // Create OR groups for each category that has multiple tags
-    // Different categories are joined with AND
     if (genderTags.length > 0) {
       if (genderTags.length === 1) {
-        queryParts.push(`tag:"${genderTags[0]}"`);
+        queryParts.push(`tag:${genderTags[0]}`);
       } else {
-        const genderQuery = genderTags.map(tag => `tag:"${tag}"`).join(' OR ');
+        const genderQuery = genderTags.map(tag => `tag:${tag}`).join(' OR ');
         queryParts.push(`(${genderQuery})`);
       }
     }
 
     if (categoryTags.length > 0) {
       if (categoryTags.length === 1) {
-        queryParts.push(`tag:"${categoryTags[0]}"`);
+        queryParts.push(`tag:${categoryTags[0]}`);
       } else {
-        const categoryQuery = categoryTags.map(tag => `tag:"${tag}"`).join(' OR ');
+        const categoryQuery = categoryTags.map(tag => `tag:${tag}`).join(' OR ');
         queryParts.push(`(${categoryQuery})`);
       }
     }
 
     if (styleTags.length > 0) {
       if (styleTags.length === 1) {
-        queryParts.push(`tag:"${styleTags[0]}"`);
+        queryParts.push(`tag:${styleTags[0]}`);
       } else {
-        const styleQuery = styleTags.map(tag => `tag:"${tag}"`).join(' OR ');
+        const styleQuery = styleTags.map(tag => `tag:${tag}`).join(' OR ');
         queryParts.push(`(${styleQuery})`);
       }
     }
 
     // Join different categories with AND
-    const result = queryParts.join(' AND ');
-    console.log('Generated query string:', result);
-    console.log('From tags:', filterState.selectedTags);
-    return result;
+    return queryParts.join(' AND ');
   };
 
   const getSortKey = () => {
