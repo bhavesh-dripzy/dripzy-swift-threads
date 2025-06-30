@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -7,7 +6,12 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { useFilter } from '../contexts/FilterContext';
 
-// Updated filter options based on your category structure
+interface FilterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApply: () => void;
+}
+
 const FILTER_OPTIONS = {
   gender: [
     { tag: "Men's Wear", display: "Men" },
@@ -64,29 +68,19 @@ const FILTER_OPTIONS = {
   ]
 };
 
-interface FilterModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApply: () => void;
-}
-
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) => {
-  const { filterState, setFilters, clearFilters } = useFilter();
-  const [localTags, setLocalTags] = useState<string[]>([]);
+  const { filterState, setFilters } = useFilter();
+  const [localSelectedTags, setLocalSelectedTags] = useState<string[]>([]);
 
-  console.log('FilterModal - Current filter state:', filterState);
-  console.log('FilterModal - Local tags:', localTags);
-
-  // Sync local state when modal opens or filter state changes
+  // Hydrate local state on modal open
   useEffect(() => {
     if (isOpen) {
-      setLocalTags(filterState.selectedTags);
+      setLocalSelectedTags(filterState.selectedTags);
     }
-  }, [isOpen, filterState.selectedTags]);
+  }, [isOpen]);
 
   const toggleTag = (tag: string) => {
-    console.log('FilterModal - Toggling tag:', tag);
-    setLocalTags(prev =>
+    setLocalSelectedTags(prev =>
       prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
@@ -94,46 +88,36 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   };
 
   const handleApply = () => {
-    console.log('FilterModal - Applying filters:', localTags);
-    setFilters(localTags); // update context
-    onApply();
+    setFilters(localSelectedTags);
+    onApply(); // triggers query refetch etc.
     onClose();
   };
 
   const handleClearAll = () => {
-    setLocalTags([]);
-    clearFilters();
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setLocalTags(prev => prev.filter(t => t !== tag));
+    setLocalSelectedTags([]);
   };
 
   const renderFilterSection = (title: string, options: { tag: string; display: string }[]) => (
     <div className="mb-6">
       <h3 className="font-semibold text-lg mb-3">{title}</h3>
       <div className="space-y-3">
-        {options.map(({ tag, display }) => {
-          const isChecked = localTags.includes(tag);
-          return (
-            <div key={tag} className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id={`checkbox-${tag}`}
-                checked={isChecked}
-                onChange={() => toggleTag(tag)}
-                className="accent-green-500 w-4 h-4"
-              />
-              <Label
-                htmlFor={`checkbox-${tag}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-                onClick={() => toggleTag(tag)}
-              >
-                {display}
-              </Label>
-            </div>
-          );
-        })}
+        {options.map(({ tag, display }) => (
+          <div key={tag} className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              id={`checkbox-${tag}`}
+              checked={localSelectedTags.includes(tag)}
+              onChange={() => toggleTag(tag)}
+              className="accent-green-500 w-4 h-4"
+            />
+            <Label
+              htmlFor={`checkbox-${tag}`}
+              className="text-sm font-medium cursor-pointer flex-1"
+            >
+              {display}
+            </Label>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -154,14 +138,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
             </Button>
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
-          {/* Selected Filters Summary */}
-          {localTags.length > 0 && (
+          {localSelectedTags.length > 0 && (
             <div className="pb-4 border-b">
               <h3 className="font-semibold mb-2">Selected Filters</h3>
               <div className="flex flex-wrap gap-2">
-                {localTags.map(tag => {
+                {localSelectedTags.map(tag => {
                   const allOptions = [
                     ...FILTER_OPTIONS.gender,
                     ...FILTER_OPTIONS.category,
@@ -169,7 +152,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                   ];
                   const option = allOptions.find(opt => opt.tag === tag);
                   const displayName = option?.display || tag;
-                  
+
                   return (
                     <Badge
                       key={tag}
@@ -177,9 +160,9 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                       className="bg-green-500 text-white"
                     >
                       {displayName}
-                      <X 
-                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
-                        onClick={() => handleRemoveTag(tag)}
+                      <X
+                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full"
+                        onClick={() => toggleTag(tag)}
                       />
                     </Badge>
                   );
@@ -188,25 +171,16 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
             </div>
           )}
 
-          {/* Filter Categories */}
           {renderFilterSection("Gender", FILTER_OPTIONS.gender)}
           {renderFilterSection("Category", FILTER_OPTIONS.category)}
           {renderFilterSection("Style", FILTER_OPTIONS.style)}
         </div>
 
-        {/* Apply Button */}
         <div className="flex gap-3 pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1"
-          >
+          <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button
-            onClick={handleApply}
-            className="flex-1 bg-green-500 hover:bg-green-600"
-          >
+          <Button onClick={handleApply} className="flex-1 bg-green-500 hover:bg-green-600">
             Apply Filters
           </Button>
         </div>
