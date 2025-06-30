@@ -76,6 +76,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - isOpen:', isOpen);
+  console.log('FilterModal - Dialog should be open:', isOpen);
 
   const handleApply = () => {
     onApply();
@@ -106,6 +107,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                 id={`checkbox-${tag}`}
                 checked={isChecked}
                 onCheckedChange={(checked) => {
+                  console.log(`FilterModal - Dialog is open when checkbox clicked:`, isOpen);
                   console.log(`FilterModal - Checkbox ${tag} onCheckedChange called with:`, checked);
                   console.log(`FilterModal - Before change, selectedTags:`, filterState.selectedTags);
                   
@@ -116,6 +118,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     console.log(`FilterModal - Removing filter: ${tag}`);
                     removeFilter(tag);
                   }
+                  
+                  // Add a small delay to see the effect
+                  setTimeout(() => {
+                    console.log(`FilterModal - After change, selectedTags:`, filterState.selectedTags);
+                  }, 100);
                 }}
               />
               <Label
@@ -130,6 +137,12 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       </div>
     </div>
   );
+
+  // Don't render anything if dialog is not open
+  if (!isOpen) {
+    console.log('FilterModal - Not rendering because isOpen is false');
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
