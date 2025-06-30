@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -122,7 +123,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                 id={`checkbox-${tag}`}
                 checked={isChecked}
                 onChange={() => toggleTag(tag)}
-                className="accent-green-500 w-4 h-4"
+                className="accent-orange-500 w-4 h-4"
               />
               <Label
                 htmlFor={`checkbox-${tag}`}
@@ -140,7 +141,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
@@ -148,14 +149,14 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
-              className="text-green-500 hover:text-green-600"
+              className="text-orange-500 hover:text-orange-600"
             >
               Clear All
             </Button>
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto space-y-4">
           {/* Selected Filters Summary */}
           {localTags.length > 0 && (
             <div className="pb-4 border-b">
@@ -174,11 +175,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     <Badge
                       key={tag}
                       variant="default"
-                      className="bg-green-500 text-white"
+                      className="bg-orange-500 text-white hover:bg-orange-600"
                     >
                       {displayName}
                       <X 
-                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full" 
+                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-orange-600 rounded-full" 
                         onClick={() => handleRemoveTag(tag)}
                       />
                     </Badge>
@@ -194,8 +195,8 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           {renderFilterSection("Style", FILTER_OPTIONS.style)}
         </div>
 
-        {/* Apply Button */}
-        <div className="flex gap-3 pt-4 border-t">
+        {/* Fixed Apply Button at Bottom */}
+        <div className="flex gap-3 pt-4 border-t mt-4">
           <Button
             variant="outline"
             onClick={onClose}
@@ -205,7 +206,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           </Button>
           <Button
             onClick={handleApply}
-            className="flex-1 bg-green-500 hover:bg-green-600"
+            className="flex-1 bg-orange-500 hover:bg-orange-600"
           >
             Apply Filters
           </Button>
@@ -216,3 +217,4 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 };
 
 export default FilterModal;
+
