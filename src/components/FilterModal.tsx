@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -76,16 +75,6 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   console.log('FilterModal - Current filter state:', filterState);
 
-  const handleTagToggle = (tag: string) => {
-    console.log('FilterModal - Toggling tag:', tag, 'Current selected:', filterState.selectedTags);
-    
-    if (filterState.selectedTags.includes(tag)) {
-      removeFilter(tag);
-    } else {
-      addFilter(tag);
-    }
-  };
-
   const handleApply = () => {
     onApply();
     onClose();
@@ -112,9 +101,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               <Checkbox
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onCheckedChange={() => {
-                  console.log(`Checkbox ${tag} toggled, current state:`, isChecked);
-                  handleTagToggle(tag);
+                onCheckedChange={(checked) => {
+                  console.log(`Checkbox ${tag} changed to:`, checked);
+                  if (checked) {
+                    addFilter(tag);
+                  } else {
+                    removeFilter(tag);
+                  }
                 }}
               />
               <Label
