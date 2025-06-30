@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFilter } from '../contexts/FilterContext';
@@ -136,9 +135,8 @@ const TrendingRightNow: React.FC = () => {
     const tags = [category.tag, category.genderTag];
     setFilters(tags);
     
-    // Create search query with AND condition for both category tag and gender tag
-    const searchQuery = `tag:${category.tag} AND tag:${category.genderTag}`;
-    navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+    // Navigate to products page without URL parameters
+    navigate('/products');
   };
 
   // Split categories into two rows of 8 each
