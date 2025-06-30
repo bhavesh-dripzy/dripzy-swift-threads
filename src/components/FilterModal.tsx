@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -78,13 +77,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   console.log('FilterModal - isOpen:', isOpen);
   console.log('FilterModal - Local tags:', localTags);
 
-  // Sync local state when modal opens
+  // Sync local state when modal opens OR when filterState changes
   useEffect(() => {
-    if (isOpen) {
-      console.log('FilterModal - Syncing local tags with context:', filterState.selectedTags);
-      setLocalTags(filterState.selectedTags);
-    }
-  }, [isOpen, filterState.selectedTags]);
+    console.log('FilterModal - Syncing local tags with context:', filterState.selectedTags);
+    setLocalTags(filterState.selectedTags);
+  }, [filterState.selectedTags]);
 
   const handleApply = () => {
     console.log('FilterModal - Applying filters:', localTags);
