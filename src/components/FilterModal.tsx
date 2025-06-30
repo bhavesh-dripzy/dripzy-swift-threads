@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -78,20 +77,23 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   console.log('FilterModal - Current filter state:', filterState);
   console.log('FilterModal - Local tags:', localTags);
 
-  // Sync local state when modal opens or filter state changes
+  // Sync local state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setLocalTags(filterState.selectedTags);
+      console.log('FilterModal - Modal opened, syncing local tags with:', filterState.selectedTags);
+      setLocalTags([...filterState.selectedTags]);
     }
   }, [isOpen, filterState.selectedTags]);
 
   const toggleTag = (tag: string) => {
     console.log('FilterModal - Toggling tag:', tag);
-    setLocalTags(prev =>
-      prev.includes(tag)
+    setLocalTags(prev => {
+      const newTags = prev.includes(tag)
         ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+        : [...prev, tag];
+      console.log('FilterModal - New local tags:', newTags);
+      return newTags;
+    });
   };
 
   const handleApply = () => {
@@ -102,11 +104,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
   };
 
   const handleClearAll = () => {
+    console.log('FilterModal - Clearing all filters');
     setLocalTags([]);
     clearFilters();
   };
 
   const handleRemoveTag = (tag: string) => {
+    console.log('FilterModal - Removing tag:', tag);
     setLocalTags(prev => prev.filter(t => t !== tag));
   };
 
@@ -116,13 +120,17 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
       <div className="space-y-3">
         {options.map(({ tag, display }) => {
           const isChecked = localTags.includes(tag);
+          console.log(`FilterModal - Checkbox ${tag}: ${isChecked}`);
           return (
             <div key={tag} className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 id={`checkbox-${tag}`}
                 checked={isChecked}
-                onChange={() => toggleTag(tag)}
+                onChange={(e) => {
+                  console.log(`FilterModal - Checkbox changed for ${tag}:`, e.target.checked);
+                  toggleTag(tag);
+                }}
                 className="accent-orange-500 w-4 h-4"
               />
               <Label
@@ -217,4 +225,3 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 };
 
 export default FilterModal;
-
