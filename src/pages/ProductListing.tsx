@@ -593,7 +593,7 @@ const ProductListPage = () => {
   return (
     <div className="min-h-screen" style={{background: 'linear-gradient(135deg, #FFEFE4 0%, #FFD8B1 100%)'}}>
       <CategoryHeader title={getHeaderTitle()} />
-      <div className="pt-16">
+      <div className="pt-24">
         <NavigationBar />
         <FilterChips onFilterChange={handleFilterChange} />
         <div className="mt-4">

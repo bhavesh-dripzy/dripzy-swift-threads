@@ -121,7 +121,7 @@ const Index: React.FC = () => {
   // Main category squares data for the promotional section with appropriate images
   const mainCategorySquares = [{
     name: 'Western Wear',
-    image: 'https://cdn.dripzyy.com/p1.avif'
+    image: 'https://cdn.dripzyy.com/w_wear.jpg'
   }, {
     name: 'Formal Wear',
     image: 'https://cdn.dripzyy.com/formal1.jpeg'
