@@ -173,7 +173,7 @@ const Index: React.FC = () => {
                 />
                 
                 <div className="bg-white rounded-2xl overflow-hidden relative">
-                  <img src="/lovable-uploads/94201d14-8dbc-4778-ab88-0695ecee9e03.png" alt="Introducing Dripzy Fashion Delivery" className="w-full h-auto object-contain relative z-10" />
+                  <img src="https://cdn.dripzyy.com/hero_banner_main.png" alt="Introducing Dripzy Fashion Delivery" className="w-full h-auto object-contain relative z-10" />
                 </div>
               </div>
             </div>
