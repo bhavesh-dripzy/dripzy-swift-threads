@@ -103,16 +103,16 @@ const Index: React.FC = () => {
   // Main category squares data for the promotional section with appropriate images
   const mainCategorySquares = [{
     name: 'Western Wear',
-    image: 'https://cdn.dripzyy.com/women2.jpg'
+    image: 'https://cdn.dripzyy.com/p1.avif'
   }, {
     name: 'Formal Wear',
     image: 'https://cdn.dripzyy.com/formal1.jpeg'
   }, {
     name: 'Inner Wear',
-    image: 'https://cdn.dripzyy.com/innerwear1.jpg'
+    image: 'https://cdn.dripzyy.com/p3.webp'
   }, {
-    name: 'Comfy Footwear',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop'
+    name: 'Sport Wear',
+    image: 'https://cdn.dripzyy.com/w5.avif'
   }];
   return <Layout cartItems={cartItems} onUpdateCartQuantity={handleUpdateCartQuantity} onRemoveCartItem={handleRemoveCartItem}>
       <div className="bg-white min-h-screen">
