@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Search, TrendingUp, Clock } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { tagService } from '../api/tagClient';
 import { useFilter } from '../contexts/FilterContext';
 
 const SearchPage: React.FC = () => {
@@ -12,25 +10,43 @@ const SearchPage: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { setFilters, filterState } = useFilter();
 
-  // Fetch tags from backend (categories + brands)
-  const { data: tags, isLoading: tagsLoading } = useQuery({
-    queryKey: ['tags'],
-    queryFn: tagService.getTags,
-  });
+  // Hardcoded categories with images (similar to Categories.tsx)
+  const categoriesData = [
+    { name: "Women's Wear", image: '/lovable-uploads/048b4d5d-3911-4fee-9d33-1b49a08709cd.png' },
+    { name: "Men's Wear", image: '/lovable-uploads/051f17ef-b214-4367-baf2-6a8cdf323caf.png' },
+    { name: 'Dresses', image: 'https://cdn.dripzyy.com/dresses.png' },
+    { name: 'Tops', image: 'https://cdn.dripzyy.com/tops.png' },
+    { name: 'Jeans', image: 'https://cdn.dripzyy.com/jeans.png' },
+    { name: 'Trousers', image: 'https://cdn.dripzyy.com/trousers.png' },
+    { name: 'T-Shirts', image: 'https://cdn.dripzyy.com/tshirts.png' },
+    { name: 'Shirts', image: 'https://cdn.dripzyy.com/shirts.png' },
+    { name: 'Co-ords', image: 'https://cdn.dripzyy.com/coords.png' },
+    { name: 'Skirts & Shorts', image: 'https://cdn.dripzyy.com/skirts.png' },
+    { name: 'Jumpsuits', image: 'https://cdn.dripzyy.com/jumpsuit.png' },
+    { name: 'Western Avenue', image: 'https://cdn.dripzyy.com/western-avenue.png' },
+    { name: 'Bras', image: 'https://cdn.dripzyy.com/bras.png' },
+    { name: 'Briefs', image: 'https://cdn.dripzyy.com/briefs.png' },
+    { name: 'Lounge Pants', image: 'https://cdn.dripzyy.com/loungepants.png' },
+    { name: 'Shapewear', image: 'https://cdn.dripzyy.com/shapewear.png' },
+    { name: 'Track Pants', image: 'https://cdn.dripzyy.com/track.png' },
+    { name: 'Jackets', image: 'https://cdn.dripzyy.com/jackets.png' },
+    { name: 'Sweatshirts', image: 'https://cdn.dripzyy.com/sweatshirt.png' },
+    { name: 'Sweaters', image: 'https://cdn.dripzyy.com/sweater.png' },
+  ];
+
+  // Filter suggestions based on search query
+  const filteredSuggestions = categoriesData.filter(suggestion =>
+    suggestion.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Use hardcoded categories for trending and popular categories
+  const trendingSearches = categoriesData.slice(0, 12);
+  const popularCategories = categoriesData.slice(0, 16);
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // Filter suggestions based on search query
-  const filteredSuggestions = (tags || []).filter(suggestion =>
-    suggestion.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Use fetched tags for trending and popular categories
-  const trendingSearches = (tags || []).slice(0, 12);
-  const popularCategories = (tags || []).slice(0, 16).map(tag => ({ name: tag, image: '/placeholder.svg' }));
 
   // Set filter on tag click (do not navigate)
   const handleTagClick = (tag: string) => {
@@ -39,7 +55,7 @@ const SearchPage: React.FC = () => {
       navigate('/products'); // Navigate without URL parameters
     } else {
       navigate('/products');
-    } // Optionally update search input
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -82,11 +98,11 @@ const SearchPage: React.FC = () => {
               {filteredSuggestions.map((suggestion, index) => (
                 <button
                   key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
+                  onClick={() => handleSuggestionClick(suggestion.name)}
                   className="w-full px-3 py-2.5 text-left hover:bg-gray-50 flex items-center gap-2.5 transition-colors border-b border-gray-100 last:border-b-0"
                 >
-                  <Search className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-gray-900 text-sm">{suggestion}</span>
+                  <img src={suggestion.image} alt={suggestion.name} className="w-5 h-5 rounded-full object-cover" />
+                  <span className="text-gray-900 text-sm">{suggestion.name}</span>
                 </button>
               ))}
             </div>
@@ -102,56 +118,49 @@ const SearchPage: React.FC = () => {
             <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
             <h2 className="text-base font-semibold text-gray-900">Trending Now</h2>
           </div>
-          {tagsLoading ? (
-            <div className="text-gray-400 text-sm">Loading...</div>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {trendingSearches.map((search, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleTagClick(search)}
-                  className={`px-2.5 py-1.5 rounded-full text-xs border transition-colors
-                    ${filterState.selectedTags.includes(search)
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'}`}
-                >
-                  {search}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-1.5">
+            {trendingSearches.map((cat, index) => (
+              <button
+                key={index}
+                onClick={() => handleTagClick(cat.name)}
+                className={`px-2.5 py-1.5 rounded-full text-xs border transition-colors flex items-center gap-2
+                  ${filterState.selectedTags.includes(cat.name)
+                    ? 'bg-orange-500 text-white border-orange-500'
+                    : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'}`}
+              >
+                <img src={cat.image} alt={cat.name} className="w-5 h-5 rounded-full object-cover" />
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Popular Categories - 4x4 Grid */}
         <div>
           <h2 className="text-base font-semibold text-gray-900 mb-2">Popular Categories</h2>
-          {tagsLoading ? (
-            <div className="text-gray-400 text-sm">Loading...</div>
-          ) : (
-            <div className="grid grid-cols-4 gap-2">
-              {popularCategories.map((category, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleTagClick(category.name)}
-                  className={`flex flex-col items-center p-2 rounded-lg transition-colors
-                    ${filterState.selectedTags.includes(category.name)
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-50 hover:bg-gray-100'}`}
-                >
-                  <div className="w-12 h-12 rounded-full overflow-hidden mb-1.5 bg-white shadow-sm">
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-center leading-tight">
-                    {category.name}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-4 gap-2">
+            {popularCategories.map((category, index) => (
+              <button
+                key={index}
+                onClick={() => handleTagClick(category.name)}
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors
+                  ${filterState.selectedTags.includes(category.name)
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-50 hover:bg-gray-100'}`}
+              >
+                <div className="w-12 h-12 rounded-full overflow-hidden mb-1.5 bg-white shadow-sm">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="text-xs font-medium text-center leading-tight">
+                  {category.name}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Recommended for you - Expanded */}
