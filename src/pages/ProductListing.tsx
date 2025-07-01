@@ -213,7 +213,7 @@ interface ShopifyCollectionResponse {
 
 const fetchProductsFromShopify = async ({ 
   pageParam = null, 
-  sortKey = null, 
+  sortKey = null,
   reverse = false,
   query = null 
 }: { 
@@ -445,11 +445,10 @@ const ProductListPage = () => {
 
   const getQueryFn = () => {
     const filterQuery = getQueryString();
-    const sortKey = getSortKey();
-    const reverse = filterState.sortBy === 'price-high';
-    
-    // Use filter query or search query
     const finalQuery = filterQuery || searchQuery || '';
+    // Use 'search' context for search queries, otherwise default
+    const sortKey = finalQuery ? getSortKey('search') : getSortKey();
+    const reverse = filterState.sortBy === 'price-high';
     
     console.log('Final query for Shopify:', finalQuery);
     
@@ -483,10 +482,10 @@ const ProductListPage = () => {
 
   const getQueryKey = () => {
     const filterQuery = getQueryString();
-    const sortKey = getSortKey();
-    const reverse = filterState.sortBy === 'price-high';
-    
     const finalQuery = filterQuery || searchQuery || '';
+    // Use 'search' context for search queries, otherwise default
+    const sortKey = finalQuery ? getSortKey('search') : getSortKey();
+    const reverse = filterState.sortBy === 'price-high';
     
     if (finalQuery) {
       return ['shopifySearchResults', finalQuery, sortKey, reverse];
