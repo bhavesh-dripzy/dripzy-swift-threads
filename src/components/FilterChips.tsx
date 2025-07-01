@@ -70,18 +70,6 @@ const FilterChips: React.FC<FilterChipsProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* New Arrival Filter Chip */}
-          <Button variant="outline" size="sm" onClick={() => handleQuickSort('newest')} className={`whitespace-nowrap ${isQuickSortActive('newest') ? 'bg-orange-50 border-orange-200 text-orange-700' : ''}`}>
-            New Arrival
-            {isQuickSortActive('newest') && <X className="ml-1 h-3 w-3" />}
-          </Button>
-
-          {/* Most Popular Filter Chip */}
-          <Button variant="outline" size="sm" onClick={() => handleQuickSort('popularity')} className={`whitespace-nowrap ${isQuickSortActive('popularity') ? 'bg-orange-50 border-orange-200 text-orange-700' : ''}`}>
-            Most Popular
-            {isQuickSortActive('popularity') && <X className="ml-1 h-3 w-3" />}
-          </Button>
-
           {/* Active Sort Indicator */}
           {filterState.sortBy && <Badge variant="secondary" className="bg-orange-100 text-orange-700">
               Sorted by {getSortLabel()}

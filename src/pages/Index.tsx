@@ -80,6 +80,23 @@ const Index: React.FC = () => {
     navigate('/products');
   };
 
+  const handleMainCategoryClick = (mainCategoryName: string) => {
+    // Map main category names to Shopify tags or product keys
+    const mainCategoryToTagMap: { [key: string]: string } = {
+      'Western Wear': "Western Wear",
+      'Formal Wear': "Formal Wear",
+      'Inner Wear': "Inner Wear",
+      'Sport Wear': "Sport Wear"
+    };
+    const tag = mainCategoryToTagMap[mainCategoryName];
+    if (tag) {
+      setFilters([tag]);
+      navigate('/products');
+    } else {
+      navigate('/products');
+    }
+  };
+
   // Category squares data with 7 categories for horizontal scroll
   const categorySquares = [{
     name: 'Women',
@@ -228,7 +245,7 @@ const Index: React.FC = () => {
               
               {/* Main Category Squares - Larger size matching reference */}
               <div className="grid grid-cols-4 gap-3 mt-2">
-                {mainCategorySquares.map((category, index) => <div key={index} className="flex flex-col items-center">
+                {mainCategorySquares.map((category, index) => <div key={index} className="flex flex-col items-center cursor-pointer" onClick={() => handleMainCategoryClick(category.name)}>
                     <div className="w-20 h-20 rounded-3xl overflow-hidden shadow-lg bg-white p-2">
                       <div className="w-full h-full rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center">
                         <img src={category.image} alt={category.name} className="w-full h-full object-cover rounded-2xl" />
