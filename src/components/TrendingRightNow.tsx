@@ -154,7 +154,7 @@ const TrendingRightNow: React.FC = () => {
         {/* Hero Section with banner image - no button */}
         <div className="relative rounded-3xl mb-6 overflow-hidden">
           <img 
-            src="/lovable-uploads/cf401a71-106c-4629-a178-b94eefae726c.png" 
+            src="https://cdn.dripzyy.com/trending_rn.png" 
             alt="Trending Right Now Banner" 
             className="w-full h-auto object-cover" 
           />

@@ -200,9 +200,9 @@ const Index: React.FC = () => {
             <div className="max-w-md mx-auto">
               {/* Main promotional content with model images */}
               <div className="flex items-center justify-between mb-2">
-                {/* Left model image - removed border styling */}
+                {/* Left model image - updated URL */}
                 <div className="w-20 h-24 overflow-hidden">
-                  <img src="/lovable-uploads/f1345680-4375-42e5-b4f1-12c76962ae5c.png" alt="Fashion Model" className="w-full h-full object-contain" />
+                  <img src="https://cdn.dripzyy.com/small_b1.png" alt="Fashion Model" className="w-full h-full object-contain" />
                 </div>
                 
                 {/* Center text content */}
@@ -219,9 +219,9 @@ const Index: React.FC = () => {
                   </button>
                 </div>
                 
-                {/* Right model image - replaced with new image */}
+                {/* Right model image - updated URL */}
                 <div className="w-20 h-24 overflow-hidden">
-                  <img src="/lovable-uploads/fed2d75f-54fd-492e-befc-995d89b0e9a0.png" alt="Fashion Model" className="w-full h-full object-contain" />
+                  <img src="https://cdn.dripzyy.com/small_b2.png" alt="Fashion Model" className="w-full h-full object-contain" />
                 </div>
               </div>
               
