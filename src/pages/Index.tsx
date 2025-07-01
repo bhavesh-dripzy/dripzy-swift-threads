@@ -25,7 +25,7 @@ interface CartItem extends LegacyProduct {
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
-  const { setFilters } = useFilter();
+  const { setFilters, clearFilters } = useFilter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   
   const handleAddToCart = (product: LegacyProduct) => {
@@ -76,6 +76,7 @@ const Index: React.FC = () => {
   };
 
   const handleShopNowClick = () => {
+    clearFilters(); // Reset filters
     navigate('/products');
   };
 
