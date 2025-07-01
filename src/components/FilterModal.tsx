@@ -108,7 +108,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               id={`checkbox-${tag}`}
               checked={localSelectedTags.includes(tag)}
               onChange={() => toggleTag(tag)}
-              className="accent-green-500 w-4 h-4"
+              className="accent-[#b97b4a] w-4 h-4"
             />
             <Label
               htmlFor={`checkbox-${tag}`}
@@ -124,7 +124,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto pb-0">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
@@ -132,7 +132,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
-              className="text-green-500 hover:text-green-600"
+              className="text-[#d49a6a] hover:text-[#b97b4a]"
             >
               Clear All
             </Button>
@@ -157,11 +157,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
                     <Badge
                       key={tag}
                       variant="default"
-                      className="bg-green-500 text-white"
+                      className="bg-[#d49a6a] text-white"
                     >
                       {displayName}
                       <X
-                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-green-600 rounded-full"
+                        className="ml-1 h-3 w-3 cursor-pointer hover:bg-[#b97b4a] rounded-full"
                         onClick={() => toggleTag(tag)}
                       />
                     </Badge>
@@ -176,11 +176,11 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           {renderFilterSection("Style", FILTER_OPTIONS.style)}
         </div>
 
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="sticky bottom-0 left-0 right-0 bg-white z-10 flex gap-3 pt-4 border-t pb-4 -mx-6 px-6">
           <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button onClick={handleApply} className="flex-1 bg-green-500 hover:bg-green-600">
+          <Button onClick={handleApply} className="flex-1 bg-[#d49a6a] hover:bg-[#b97b4a]">
             Apply Filters
           </Button>
         </div>

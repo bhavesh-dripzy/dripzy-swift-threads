@@ -1,76 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Search, TrendingUp, Clock } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { tagService } from '../api/tagClient';
+import { useFilter } from '../contexts/FilterContext';
 
 const SearchPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { setFilters, filterState } = useFilter();
+
+  // Fetch tags from backend (categories + brands)
+  const { data: tags, isLoading: tagsLoading } = useQuery({
+    queryKey: ['tags'],
+    queryFn: tagService.getTags,
+  });
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Updated typeahead suggestions
-  const suggestions = [
-    'Men\'s T-shirt',
-    'Women\'s dresses',
-    'Women\'s tops',
-    'Innerwear'
-  ];
-
   // Filter suggestions based on search query
-  const filteredSuggestions = suggestions.filter(suggestion =>
+  const filteredSuggestions = (tags || []).filter(suggestion =>
     suggestion.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Updated trending searches with fashion-specific items
-  const trendingSearches = [
-    'mini dresses',
-    'oversized tee',
-    'bra',
-    'crop tops',
-    'skinny jeans',
-    'sneakers',
-    'handbags',
-    'maxi dress',
-    'polo shirt',
-    'cargo pants',
-    'tank tops',
-    'floral dress'
-  ];
+  // Use fetched tags for trending and popular categories
+  const trendingSearches = (tags || []).slice(0, 12);
+  const popularCategories = (tags || []).slice(0, 16).map(tag => ({ name: tag, image: '/placeholder.svg' }));
 
-  // Expanded popular categories (4x4 grid)
-  const popularCategories = [
-    { name: 'Women Dresses', image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=80&h=80&fit=crop' },
-    { name: 'Men T-Shirts', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80&h=80&fit=crop' },
-    { name: 'Casual Shoes', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=80&h=80&fit=crop' },
-    { name: 'Handbags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=80&h=80&fit=crop' },
-    { name: 'Jeans', image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=80&h=80&fit=crop' },
-    { name: 'Accessories', image: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=80&h=80&fit=crop' },
-    { name: 'Watches', image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop' },
-    { name: 'Ethnic Wear', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=80&h=80&fit=crop' },
-    { name: 'Formal Shirts', image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=80&h=80&fit=crop' },
-    { name: 'Sneakers', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&h=80&fit=crop' },
-    { name: 'Sunglasses', image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=80&h=80&fit=crop' },
-    { name: 'Jewelry', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=80&h=80&fit=crop' },
-    { name: 'Innerwear', image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=80&h=80&fit=crop' },
-    { name: 'Sports Wear', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=80&h=80&fit=crop' },
-    { name: 'Footwear', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=80&h=80&fit=crop' },
-    { name: 'Winter Wear', image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=80&h=80&fit=crop' }
-  ];
-
-  const handleSearch = (query: string) => {
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
+  // Set filter on tag click (do not navigate)
+  const handleTagClick = (tag: string) => {
+    if (tag) {
+      setFilters([tag]);
+      navigate('/products'); // Navigate without URL parameters
+    } else {
+      navigate('/products');
+    } // Optionally update search input
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setSearchQuery(suggestion);
-    handleSearch(suggestion);
+    handleTagClick(suggestion);
   };
 
   useEffect(() => {
@@ -95,7 +69,7 @@ const SearchPage: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSuggestionClick(searchQuery)}
               placeholder="Search for products..."
               className="w-full pl-8 pr-3 py-2.5 bg-gray-100 text-gray-900 placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
               autoFocus
@@ -128,42 +102,56 @@ const SearchPage: React.FC = () => {
             <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
             <h2 className="text-base font-semibold text-gray-900">Trending Now</h2>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {trendingSearches.map((search, index) => (
-              <button
-                key={index}
-                onClick={() => handleSuggestionClick(search)}
-                className="px-2.5 py-1.5 bg-orange-50 text-orange-700 rounded-full text-xs hover:bg-orange-100 transition-colors border border-orange-200"
-              >
-                {search}
-              </button>
-            ))}
-          </div>
+          {tagsLoading ? (
+            <div className="text-gray-400 text-sm">Loading...</div>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {trendingSearches.map((search, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleTagClick(search)}
+                  className={`px-2.5 py-1.5 rounded-full text-xs border transition-colors
+                    ${filterState.selectedTags.includes(search)
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'}`}
+                >
+                  {search}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Popular Categories - 4x4 Grid */}
         <div>
           <h2 className="text-base font-semibold text-gray-900 mb-2">Popular Categories</h2>
-          <div className="grid grid-cols-4 gap-2">
-            {popularCategories.map((category, index) => (
-              <button
-                key={index}
-                onClick={() => handleSuggestionClick(category.name)}
-                className="flex flex-col items-center p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="w-12 h-12 rounded-full overflow-hidden mb-1.5 bg-white shadow-sm">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="text-xs font-medium text-gray-700 text-center leading-tight">
-                  {category.name}
-                </span>
-              </button>
-            ))}
-          </div>
+          {tagsLoading ? (
+            <div className="text-gray-400 text-sm">Loading...</div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {popularCategories.map((category, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleTagClick(category.name)}
+                  className={`flex flex-col items-center p-2 rounded-lg transition-colors
+                    ${filterState.selectedTags.includes(category.name)
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-gray-50 hover:bg-gray-100'}`}
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden mb-1.5 bg-white shadow-sm">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-center leading-tight">
+                    {category.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Recommended for you - Expanded */}
