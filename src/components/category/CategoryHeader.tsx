@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag } from 'lucide-react';
 import NotificationIconWithBadge from '../header/NotificationIconWithBadge';
+import LocationDisplay from '../header/LocationDisplay';
 import { useAuth } from '../../contexts/AuthContext';
 import { auth } from '../../firebase';
 
@@ -32,6 +33,12 @@ const CategoryHeader: React.FC<CategoryHeaderProps> = ({ title }) => {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50" style={{background: 'linear-gradient(135deg, #FFEFE4 0%, #FFD8B1 100%)'}}>
+      {/* First row: Location */}
+      <div className="px-4 pt-2 pb-0.5">
+        <LocationDisplay />
+      </div>
+      
+      {/* Second row: Navigation and icons */}
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left side - Back button and logo */}
         <div className="flex items-center gap-3">
