@@ -4,6 +4,8 @@ import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag } from 'lucide-react';
 import NotificationIconWithBadge from '../header/NotificationIconWithBadge';
+import { useAuth } from '../../contexts/AuthContext';
+import { auth } from '../../firebase';
 
 interface CategoryHeaderProps {
   title: string;
@@ -11,6 +13,8 @@ interface CategoryHeaderProps {
 
 const CategoryHeader: React.FC<CategoryHeaderProps> = ({ title }) => {
   const navigate = useNavigate();
+  const { isLoading } = useAuth();
+  const firebaseUser = auth.currentUser;
 
   const handleBack = () => {
     navigate('/');
@@ -18,6 +22,12 @@ const CategoryHeader: React.FC<CategoryHeaderProps> = ({ title }) => {
 
   const handleSearchClick = () => {
     navigate('/search-page');
+  };
+
+  const handleCartClick = () => {
+    if (isLoading) return;
+    if (firebaseUser) navigate('/cart');
+    else navigate('/auth');
   };
 
   return (
@@ -44,12 +54,12 @@ const CategoryHeader: React.FC<CategoryHeaderProps> = ({ title }) => {
             <Search className="w-6 h-6 text-gray-900" />
           </button>
           <NotificationIconWithBadge badgeCount={2} />
-          <div className="relative">
+          <button onClick={handleCartClick} className="relative">
             <ShoppingBag className="w-6 h-6 text-gray-900" />
             <div className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               0
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>
