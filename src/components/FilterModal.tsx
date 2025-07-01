@@ -124,7 +124,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto pb-0">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Filters</span>
@@ -176,7 +176,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) =
           {renderFilterSection("Style", FILTER_OPTIONS.style)}
         </div>
 
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="sticky bottom-0 left-0 right-0 bg-white z-10 flex gap-3 pt-4 border-t pb-4 -mx-6 px-6">
           <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
