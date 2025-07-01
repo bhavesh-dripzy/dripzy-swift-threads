@@ -449,7 +449,7 @@ const ProductListPage = () => {
     const reverse = filterState.sortBy === 'price-high';
     
     // Use filter query or search query
-    let finalQuery = filterQuery || searchQuery || '';
+    const finalQuery = filterQuery || searchQuery || '';
     
     console.log('Final query for Shopify:', finalQuery);
     
@@ -486,7 +486,7 @@ const ProductListPage = () => {
     const sortKey = getSortKey();
     const reverse = filterState.sortBy === 'price-high';
     
-    let finalQuery = filterQuery || searchQuery || '';
+    const finalQuery = filterQuery || searchQuery || '';
     
     if (finalQuery) {
       return ['shopifySearchResults', finalQuery, sortKey, reverse];

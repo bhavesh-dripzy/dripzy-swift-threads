@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface FilterState {
@@ -146,7 +145,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
       case 'price-high':
         return 'PRICE';
       case 'newest':
-        return 'CREATED_AT';
+        return 'RELEVANCE';
       case 'popularity':
         return 'BEST_SELLING';
       default:
