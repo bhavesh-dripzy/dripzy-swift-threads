@@ -11,6 +11,8 @@ interface LocationData {
   error: string | null;
 }
 
+const GOOGLE_MAPS_API_KEY = "AIzaSyAxLcnwB8NW5AIObRuIKMinfNvENzzgRZE";
+
 export const useGeolocation = () => {
   const [locationData, setLocationData] = useState<LocationData>({
     address: "Enable location for delivery",
@@ -35,28 +37,36 @@ export const useGeolocation = () => {
         const { latitude, longitude } = position.coords;
         
         try {
-          // Using a free geocoding service
+          // Using Google Maps Geocoding API for more precise location
           const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
           );
           
           if (!response.ok) {
-            throw new Error('Failed to fetch address');
+            throw new Error('Failed to fetch address from Google Maps');
           }
           
           const data = await response.json();
-          const address = `${data.locality || data.city || ''}, ${data.principalSubdivision || ''}, ${data.countryName || ''}`.replace(/^,\s*|,\s*$/g, '');
           
-          setLocationData({
-            address: address || "Location detected",
-            coordinates: { latitude, longitude },
-            isLoading: false,
-            error: null,
-          });
+          if (data.status === 'OK' && data.results && data.results.length > 0) {
+            // Get the most accurate address (usually the first result)
+            const result = data.results[0];
+            const formattedAddress = result.formatted_address;
+            
+            setLocationData({
+              address: formattedAddress,
+              coordinates: { latitude, longitude },
+              isLoading: false,
+              error: null,
+            });
+          } else {
+            throw new Error('No address found for coordinates');
+          }
         } catch (error) {
-          console.error('Error fetching address:', error);
+          console.error('Error fetching address from Google Maps:', error);
+          // Fallback to coordinates display
           setLocationData({
-            address: `Location: ${latitude.toFixed(2)}, ${longitude.toFixed(2)}`,
+            address: `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
             coordinates: { latitude, longitude },
             isLoading: false,
             error: null,
@@ -87,8 +97,8 @@ export const useGeolocation = () => {
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000, // 5 minutes
+        timeout: 15000,
+        maximumAge: 60000, // 1 minute cache
       }
     );
   };
